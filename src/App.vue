@@ -1,0 +1,105 @@
+<template>
+  <div id="app">
+    <div v-if="isLoggedIn">
+      <PlaylistBuilder
+        :accessToken="accessToken"
+        @unauthorized="resetAccessToken"
+      />
+    </div>
+    <div v-else>
+      <Login/>
+    </div>
+    <div id="disclaimer">
+      Made by Jamie Smith - <a href="http://www.jamieistyping.com" target="_blank">www.jamieistyping.com</a>. This website is in no way affiliate with Spotify.
+    </div> 
+  </div>
+</template>
+
+<script>
+import Login from './Login.vue'
+import PlaylistBuilder from './PlaylistBuilder.vue'
+import VueCookies from 'vue-cookies'
+
+export default {
+  name: 'app',
+
+  components: {
+    PlaylistBuilder,
+    Login,
+  },
+
+  data () {
+    return {
+      accessToken: '',
+      refreshToken: '',
+    }
+  },
+
+  computed: {
+    isLoggedIn() {
+      return this.accessToken.length ? true : false;
+    }
+  },
+
+  methods: {
+    resetAccessToken: function() {
+      console.log('resetAccessToken running');
+      if (this.refreshToken) {
+        console.log('has refreshToken');
+        window.location = "/refresh_token";
+      } else {
+        console.log('resetting accessToken');
+        this.accessToken = '';
+      }
+    }
+  },
+
+  mounted() {
+    if (VueCookies.get('access_token')) {
+      this.accessToken = VueCookies.get('access_token');
+    }
+
+    if (VueCookies.get('refresh_token')) {
+      this.refreshToken = VueCookies.get('refresh_token');
+    }
+  }
+}
+</script>
+
+<style lang="scss">
+#app {
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 10px;
+}
+
+h1, h2 {
+  font-weight: normal;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  display: inline-block;
+  margin: 0 10px;
+}
+
+a {
+  color: #04dc5c;
+}
+
+  #disclaimer {
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
+    padding: 10px 0;
+    font-size: 12px;
+    background: #fff;
+  }
+</style>
