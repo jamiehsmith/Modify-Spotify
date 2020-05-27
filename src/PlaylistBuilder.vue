@@ -34,8 +34,25 @@
         <div class="playlist-item"
           v-for="item in topCombined" :key="item"
           v-bind:style="{ backgroundImage: itemBackground(item) }"
+          v-on:mouseenter="showInfo(item.id)"
+          v-on:mouseleave="showInfo(null)"
+          v-on:click="clickItem(item)"
         >
-          <div class="playlist-item-title">{{ item.name }}</div>
+          <div class="playlist-item-title"
+           v-if="hoveredOn === item.id"
+          >
+            <b>{{ item.type.toUpperCase() }}</b>
+            <br>
+            <span v-if="item.type === 'track' && item.artists && item.artists.length && item.artists[0].name">
+              {{ item.name }} by {{ item.artists[0].name }}
+            </span>
+            <span v-else>
+              {{ item.name }}
+            </span>
+          </div>
+          <div v-if="isSelected(item)">
+            SELECTED
+          </div>
         </div>
       </div>
     </div>
@@ -54,6 +71,8 @@ export default {
       topArtists: [],
       topTracks: [],
       topCombined: [],
+      hoveredOn: null,
+      selected: [],
   	}
   },
 
@@ -95,6 +114,22 @@ export default {
       } else if (item.type === 'track' && item.album
           && item.album.images && item.album.images.length) {
         return `url(${item.album.images[0].url})`;
+      }
+    },
+
+    showInfo(id) {
+        this.hoveredOn = id;
+    },
+
+    isSelected(item) {
+      return this.selected.some(x => x['id'] === item.id);
+    },
+
+    clickItem(item) {
+      if (this.isSelected(item)) {
+        this.selected = this.selected.filter(x => x.id !== item.id);
+      } else {
+        this.selected.push(item);
       }
     },
 
@@ -172,11 +207,18 @@ export default {
         width: 100px;
         background-repeat: no-repeat;
         background-size: cover;
+        cursor: pointer;
         .playlist-item-title {
+          flex-direction: column;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 100%;
           width: 100%;
           background: #fff;
           font-size: 12px;
-          opacity: .85;
+          opacity: .9;
+          overflow: hidden;
         }
       }
     }
