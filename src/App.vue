@@ -43,12 +43,9 @@ export default {
 
   methods: {
     resetAccessToken: function() {
-      console.log('resetAccessToken running');
       if (this.refreshToken) {
-        console.log('has refreshToken');
         window.location = "/refresh_token";
       } else {
-        console.log('resetting accessToken');
         this.accessToken = '';
       }
     }
