@@ -6,7 +6,7 @@
         @unauthorized="resetAccessToken"
       />
     </div>
-    <div v-else>
+    <div v-else id="app-login">
       <Login/>
     </div>
     <div id="disclaimer">
@@ -64,6 +64,9 @@ export default {
 </script>
 
 <style lang="scss">
+html, body {
+  height: 100%;
+}
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -71,6 +74,15 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 10px;
+  height: 100%;
+  width: 100%;
+  #app-login {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 }
 
 h1, h2 {

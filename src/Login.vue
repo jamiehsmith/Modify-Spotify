@@ -38,7 +38,7 @@ export default {
 		flex-direction: column;
 		align-items: center;
 		#login-button {
-			margin-top: 40px;
+			margin-top: 30px;
 			outline: none;
 			display: flex;
 			flex-direction: row;
@@ -50,7 +50,7 @@ export default {
 			background-color: white;
 			color: #04dc5c;
 			cursor: pointer;
-			border: 1px solid black;
+			border: 1px solid #ccc;
 			#spotify-logo {
 				height: 25px;
 				padding-right: 10px;
