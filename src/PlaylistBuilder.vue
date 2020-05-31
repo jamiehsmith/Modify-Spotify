@@ -28,6 +28,7 @@
             :tags="selected"
             :max-tags="maxOptions"
             :placeholder="tagPlaceholder"
+            :class="{'show-error': showError}"
             @tags-changed="newTags => tags = newTags"
             @before-deleting-tag="deleteTag"
           >
@@ -36,6 +37,9 @@
             </div>
           </vue-tags-input>
         </div>
+        <div v-if="showError" class="playlist-builder-row">
+          <span id="error-text">This field cannot be empty. Choose artist(s) and/or track(s) from the right.</span>
+        </div>
         <div
           id="playlist-builder-max-selected"
           v-if="maxOptionsSelected"
@@ -43,12 +47,30 @@
           Maximum of 5 options selected.
         </div>
         <div class="playlist-builder-row">
-          <span class="playlist-builder-option-text">Playlist name:</span>
-          <input id="playlist-builder-name" v-model="message" placeholder="Enter name">
+          <span class="playlist-builder-option-text">Number of tracks:</span>
+          <multiselect
+            v-model="numberOfTracks"
+            track-by="name"
+            label="label"
+            :options="numberOfTracksOptions"
+            :searchable="false"
+            :close-on-select="true"
+            :show-labels="false"
+            :allow-empty="false"
+          >
+          </multiselect>
         </div>
         <div class="playlist-builder-row">
-          <button v-on:click="makePlaylist" id="make-playlist-button">
-            <span id="login-button-text">Make Playlist</span>
+          <span class="playlist-builder-option-text">Playlist name:</span>
+          <input id="playlist-builder-name" v-model="playlistName" placeholder="Enter name">
+        </div>
+        <div class="playlist-builder-row">
+          <button v-on:click.prevent="makePlaylist" :disabled="isLoading" id="make-playlist-button">
+            <span>Make Playlist</span>
+            <img id="playlist-loading-icon" v-if="isLoading" src="./assets/loading.gif"/>
+          </button>
+          <button v-on:click="reset" id="reset-playlist-button">
+            <span>Reset</span>
           </button>
         </div>
       </div>
@@ -82,14 +104,23 @@ export default {
 	  return {
       tag: '',
       selected: [],
+      isLoading: false,
       maxOptions: 5,
       tagPlaceholder: '',
+      playlistName: '',
       playlistOptions: [
         { name: 'custom', label: 'Custom playlist' },
         { name: 'top', label: 'Top artists and songs' },
         { name: 'random', label: 'Surprise me!' }
       ],
       playlistValue: { name: 'custom', label: 'Custom playlist' },
+      numberOfTracks: { name: '25', label: '25' },
+      numberOfTracksOptions: [
+        { name: '25', label: '25' },
+        { name: '50', label: '50' },
+        { name: '100', label: '100' },
+      ],
+      showError: false,
   	}
   },
 
@@ -97,7 +128,11 @@ export default {
   	accessToken: {
       type: String,
       required: true,
-  	}
+    },
+    userId: {
+      type: Number,
+      required: true,
+    }
   },
 
   computed: {
@@ -115,34 +150,141 @@ export default {
       this.selected = selected;
     },
 
-    async spotifyCall(url) {
+    async spotifyPostCall(url, data={}) {
       const self = this;
-      let data = [];
+      let resp = [];
 
-      await axios.get(`${url}?limit=50`, {
+      await axios.post(url, data, {
         headers: {
-          Authorization: 'Bearer ' + this.accessToken
-        }
+          Authorization: 'Bearer ' + this.accessToken,
+          'Content-Type': 'application/json'
+        },
       }).then(function (response) {
-        data = response.data.items;
+        resp = response.data;
       })
       .catch(function (error) {
         self.unauthorized();
       });
-      return data;
+      return resp;
     },
 
-    makePlaylist() {
-      console.log('to do', this.selected);
+    async spotifyGetSeeds(url, data={}) {
+      const self = this;
+      let resp = [];
+
+      await axios.get(url, {
+        headers: {
+          Authorization: 'Bearer ' + this.accessToken
+        },
+        params: data,
+      }).then(function (response) {
+        resp = response.data.tracks;
+      })
+      .catch(function (error) {
+        console.log('error is', error.response.status);
+        if (error.response.status === 401) {
+          console.log('unauthorized!!1');
+          self.unauthorized();
+        } else {
+          console.log('other error');
+          self.noSuggestions();
+        }
+      });
+      return resp;
+    },
+
+    async makePlaylist() {
+      if (!this.selected.length) {
+        this.showError = true;
+        return;
+      }
+
+      this.isLoading = true;
+      let artists = [];
+      let tracks = [];
+      let names = [];
+
+      artists = this.selected
+        .filter(x => x.type === 'artist')
+        .map(x => x.id);
+
+      tracks = this.selected
+        .filter(x => x.type === 'track')
+        .map(x => x.id);
+
+      names = this.selected.map(x => x.name);
+
+      let url = 'https://api.spotify.com/v1/recommendations';
+      let data = {
+        'seed_tracks': tracks.join(','),
+        'seed_artists': artists.join(','),
+        'limit': this.numberOfTracks.name,
+      }
+
+      let playlistTracks = await this.spotifyGetSeeds(url, data);
+
+      if (playlistTracks.length) {
+        playlistTracks = playlistTracks.map(x => x.uri);
+
+        if (!this.playlistName.length) {
+          this.playlistName = "ModifySpotify Mix";
+        }
+
+        url = `https://api.spotify.com/v1/users/${this.userId}/playlists`;
+
+        data = JSON.stringify({
+          name: this.playlistName,
+          description: `${names.join(' x ')} #ModifySpotify`,
+          public: 'true',
+        });
+
+        let playlistResp = await this.spotifyPostCall(url, data);
+
+        if (playlistResp) {
+          console.log('has resp!!!')
+          url = `https://api.spotify.com/v1/users/${this.userId}/playlists/${playlistResp.id}/tracks`;
+          data = JSON.stringify({
+            'uris': playlistTracks,
+          });
+
+          let playlistTracksResp = await this.spotifyPostCall(url, data);
+
+          if (playlistTracksResp) {
+            const twitterShare = `https://twitter.com/intent/tweet?url=${playlistResp.external_urls.spotify}&text=Check%20out%20this%20playlist%20I%20made%20on%20ModifySpotify.com`;
+            const facebookShare = `https://www.facebook.com/sharer/sharer.php?u=${playlistResp.external_urls.spotify}`;
+
+            let span = document.createElement("span");
+            span.innerHTML = `<a href="${playlistResp.external_urls.spotify}" target="_blank">Click here to view playlist</a><div id="share-playlist">Share this playlist:<div id="share-icons"><a href="${twitterShare}" target="_blank"><div id="twitter-icon"></div><a href="${facebookShare}" target="_blank"><div id="facebook-icon"></div></div></div>`;
+
+            this.$swal({
+                title: `${this.playlistName} playlist created!`,
+                content: span,
+                allowOutsideClick: "true"
+            });
+          }
+        }
+      }
+
+      this.isLoading = false;
+    },
+
+    reset() {
+      this.selected = [];
+      this.playlistValue = this.playlistOptions[0];
     },
 
     unauthorized() {
       this.$emit('unauthorized');
     },
-  },
 
-  async created() {
-  }
+    noSuggestions() {
+      this.$swal({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Spotify did not return any song recommendations. Please change your selection and try again.',
+      })
+    },
+  },
 }
 </script>
 
@@ -155,6 +297,8 @@ export default {
     flex-direction: column;
     justify-content: center;
     min-width: 300px;
+    overflow: scroll;
+    height: 90vh;
     #playlist-builder {
       display: flex;
       flex-direction: column;
@@ -183,7 +327,16 @@ export default {
           .ti-input {
             border-radius: 5px;
           }
+          &.show-error {
+            .ti-input {
+              border: 1px solid red;
+            }
+          }
         }
+      }
+      #error-text {
+        white-space: normal;
+        color: red;
       }
       #playlist-builder-max-selected {
         padding-top: 5px;
@@ -201,7 +354,7 @@ export default {
         outline: none;
         width: 100%;
       }
-      #make-playlist-button {
+      #make-playlist-button, #reset-playlist-button {
         padding: 10px;
         margin-top: 5px;
         outline: none;
@@ -210,6 +363,19 @@ export default {
         color: #2c3e50;
         cursor: pointer;
         border: 1px solid #ccc;
+        margin: 5px;
+      }
+
+      #make-playlist-button {
+        align-items: center;
+        display: flex;
+        &:disabled {
+          cursor: not-allowed;
+        }
+        #playlist-loading-icon {
+          height: 15px;
+          padding-left: 5px;
+        }
       }
     }
   }
@@ -220,16 +386,12 @@ export default {
   }
 }
 
-#playlist-builder-options::-webkit-scrollbar { 
-    display: none;
-}
-
 body {
   height: 100vh;
   overflow: hidden;
 }
 
-body::-webkit-scrollbar { 
+body::-webkit-scrollbar, #builder-row::-webkit-scrollbar, #playlist-builder-options::-webkit-scrollbar {
     display: none;
 }
 
@@ -253,6 +415,52 @@ body::-webkit-scrollbar {
   .multiselect__option--selected.multiselect__option--highlight {
     background: #f3f3f3;
     color: #35495e;
+  }
+}
+
+.swal-modal {
+  .swal-title {
+    font-family: Avenir,Helvetica,Arial,sans-serif;
+    font-weight: 500;
+    font-size: 20px;
+  }
+  .swal-content, .swal-text {
+    font-family: Avenir,Helvetica,Arial,sans-serif;
+  }
+
+  .swal-text {
+    text-align: center;
+  }
+
+  .swal-footer {
+    display: flex;
+    justify-content: center;
+  }
+}
+
+#share-playlist {
+  padding-top: 10px;
+  #share-icons {
+    display: flex;
+    justify-content: center;
+    #twitter-icon {
+      margin: 5px;
+      width: 35px;
+      height: 35px;
+      background-image: url('./assets/twitter.png');
+      background-size: cover;
+      background-repeat: no-repeat;
+      border: none;
+    }
+    #facebook-icon {
+      margin: 5px;
+      width: 35px;
+      height: 35px;
+      background-image: url('./assets/facebook.png');
+      background-size: cover;
+      background-repeat: no-repeat;
+      border: none;
+    }
   }
 }
 

@@ -29,6 +29,7 @@
 
 <script>
 import axios from 'axios'
+import VueCookies from 'vue-cookies'
 
 export default {
   name: 'UserInfo',
@@ -91,6 +92,7 @@ export default {
 
   async created() {
     this.userInfo = await this.meCall();
+    VueCookies.set('user_id', this.userInfo.id);
   }
 }
 </script>

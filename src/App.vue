@@ -3,6 +3,7 @@
     <div v-if="isLoggedIn">
       <PlaylistBuilder
         :accessToken="accessToken"
+        :userId="userId"
         @unauthorized="resetAccessToken"
       />
     </div>
@@ -32,6 +33,7 @@ export default {
     return {
       accessToken: '',
       refreshToken: '',
+      userId: null,
     }
   },
 
@@ -58,6 +60,10 @@ export default {
 
     if (VueCookies.get('refresh_token')) {
       this.refreshToken = VueCookies.get('refresh_token');
+    }
+
+    if (VueCookies.get('user_id')) {
+      this.userId = VueCookies.get('user_id');
     }
   }
 }

@@ -23,8 +23,8 @@
           {{ item.name }}
         </span>
       </div>
-      <div v-if="isSelected(item)">
-        SELECTED
+      <div class="playlist-item-selected" v-if="isSelected(item)">
+        <img class="playlist-selected-checkmark" src="./assets/checkmark.png"/>
       </div>
     </div>
   </div>
@@ -162,6 +162,18 @@ export default {
       font-size: 12px;
       opacity: .9;
       overflow: hidden;
+    }
+    .playlist-item-selected {
+      height: 94%;
+      width: 94%;
+      border: 3px solid white;
+      position: relative;
+      .playlist-selected-checkmark {
+        height: 20px;
+        position: absolute;
+        right: 5px;
+        top: 5px;
+      }
     }
   }
   .playlist-item-disabled {
