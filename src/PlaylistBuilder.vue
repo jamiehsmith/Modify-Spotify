@@ -296,7 +296,6 @@ export default {
     justify-content: center;
     min-width: 300px;
     overflow: scroll;
-    height: 90vh;
     #playlist-builder {
       display: flex;
       flex-direction: column;
