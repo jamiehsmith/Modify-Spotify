@@ -147,6 +147,7 @@ export default {
     },
 
     updateSelected(selected) {
+      this.showError = false;
       this.selected = selected;
     },
 
@@ -181,12 +182,9 @@ export default {
         resp = response.data.tracks;
       })
       .catch(function (error) {
-        console.log('error is', error.response.status);
         if (error.response.status === 401) {
-          console.log('unauthorized!!1');
           self.unauthorized();
         } else {
-          console.log('other error');
           self.noSuggestions();
         }
       });
@@ -241,7 +239,6 @@ export default {
         let playlistResp = await this.spotifyPostCall(url, data);
 
         if (playlistResp) {
-          console.log('has resp!!!')
           url = `https://api.spotify.com/v1/users/${this.userId}/playlists/${playlistResp.id}/tracks`;
           data = JSON.stringify({
             'uris': playlistTracks,
@@ -270,6 +267,7 @@ export default {
 
     reset() {
       this.selected = [];
+      this.showError = false;
       this.playlistValue = this.playlistOptions[0];
     },
 
