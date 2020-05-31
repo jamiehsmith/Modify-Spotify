@@ -1,32 +1,10 @@
 <template>
   <div id="playlist-builder-container">
     <div id="builder-row">
-      <div id="user-info">
-        <img id="user-image"
-          :v-if="userImage"
-          :src="userImage"
-        />
-        <div id="user-info-text">
-          <span id="user-name" 
-            :v-if="userInfo.display_name"
-          >
-            {{ userInfo.display_name }}
-          </span>
-          <span id="user-info-row">
-            <span :v-if="userFollowers">
-              Followers: {{ userFollowers }}
-            </span>
-            <span id="user-info-separator"
-             :v-if="userFollowers && userProfileUrl"
-            >
-              &middot;
-            </span>
-            <span :v-if="userProfileUrl">
-              <a :href="userProfileUrl" target="_blank">Profile</a>
-            </span>
-          </span>
-        </div>
-      </div>
+      <UserInfo
+        :accessToken="accessToken"
+        @unauthorized="unauthorized"
+      />
       <div id="playlist-builder">
         <span id="playlist-builder-title">Playlist Builder</span>
         <div class="playlist-builder-row">
@@ -40,7 +18,6 @@
             :close-on-select="true"
             :show-labels="false"
             :allow-empty="false"
-            @input="onChangePlaylistType"
           >
           </multiselect>
         </div>
@@ -77,52 +54,32 @@
       </div>
     </div>
     <div id="playlist-builder-options">
-      <div id="playlist-options">
-        <div
-          :class="{
-            'playlist-item': true,
-            'playlist-item-disabled': maxOptionsSelected && !isSelected(item)
-          }"
-          v-for="item in topCombined" :key="item"
-          v-bind:style="{ backgroundImage: itemBackground(item) }"
-          v-on:mouseenter="showInfo(item.id)"
-          v-on:mouseleave="showInfo(null)"
-          v-on:click="clickItem(item)"
-        >
-          <div class="playlist-item-title"
-           v-if="hoveredOn === item.id"
-          >
-            <b>{{ item.type.toUpperCase() }}</b>
-            <br>
-            <span v-if="item.type === 'track' && item.artists && item.artists.length && item.artists[0].name">
-              {{ item.name }} by {{ item.artists[0].name }}
-            </span>
-            <span v-else>
-              {{ item.name }}
-            </span>
-          </div>
-          <div v-if="isSelected(item)">
-            SELECTED
-          </div>
-        </div>
-      </div>
+      <PlaylistOptions
+        :accessToken="accessToken"
+        :selected="selected"
+        :playlistType="playlistValue"
+        @selectedUpdated="updateSelected"
+        @unauthorized="unauthorized"
+      />
     </div>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
+import UserInfo from './UserInfo.vue'
+import PlaylistOptions from './PlaylistOptions.vue'
 
 export default {
   name: 'PlaylistBuilder',
 
+  components: {
+    UserInfo,
+    PlaylistOptions,
+  },
+
    data () {
 	  return {
-      userInfo: {},
-      topArtists: [],
-      topTracks: [],
-      topCombined: [],
-      hoveredOn: null,
       tag: '',
       selected: [],
       maxOptions: 5,
@@ -144,32 +101,6 @@ export default {
   },
 
   computed: {
-    selectedFormatted() {
-      return this.selected.map(item => item.name);
-    },
-
-    queryParams() {
-      return 'limit=50';
-    },
-
-    userImage() {
-      if (this.userInfo.images && this.userInfo.images.length) {
-        return this.userInfo.images[0].url;
-      }
-    },
-
-    userFollowers() {
-      if (this.userInfo.followers && this.userInfo.followers.total) {
-        return this.userInfo.followers.total;
-      }
-    },
-
-    userProfileUrl() {
-      if (this.userInfo.external_urls && this.userInfo.external_urls.spotify) {
-        return this.userInfo.external_urls.spotify;
-      } 
-    },
-
     maxOptionsSelected() {
       return this.selected.length >= this.maxOptions;
     }
@@ -180,59 +111,23 @@ export default {
       this.selected = this.selected.filter(x => x.id !== params.tag.text.id);
     },
 
-    onChangePlaylistType(type) {
-      this.selected =[];
-      if (type.name === 'top') {
-        this.selected = this.topCombined.slice(0, 5);
-      } else if (type.name === 'random') {
-        for (let i = 0; i < 5; i++) {
-          this.selected.push(this.topCombined[Math.floor(Math.random() * this.topCombined.length)]);
-        }
-      }
+    updateSelected(selected) {
+      this.selected = selected;
     },
 
-    itemBackground(item) {
-      if (item.type === 'artist' && item.images && item.images.length) {
-        return `url(${item.images[0].url})`;
-      } else if (item.type === 'track' && item.album
-          && item.album.images && item.album.images.length) {
-        return `url(${item.album.images[0].url})`;
-      }
-    },
-
-    showInfo(id) {
-        this.hoveredOn = id;
-    },
-
-    isSelected(item) {
-      return this.selected.some(x => x['id'] === item.id);
-    },
-
-    clickItem(item) {
-      if (this.isSelected(item)) {
-        this.selected = this.selected.filter(x => x.id !== item.id);
-      } else if (this.selected.length < this.maxOptions) {
-        this.selected.push(item);
-      }
-    },
-
-    async spotifyCall(url, items=false) {
+    async spotifyCall(url) {
       const self = this;
       let data = [];
 
-      if (items) {
-        url = `${url}?${this.queryParams}`;
-      }
-
-      await axios.get(url, {
+      await axios.get(`${url}?limit=50`, {
         headers: {
           Authorization: 'Bearer ' + this.accessToken
         }
       }).then(function (response) {
-        data = items ? response.data.items : response.data;
+        data = response.data.items;
       })
       .catch(function (error) {
-        self.$emit('unauthorized');
+        self.unauthorized();
       });
       return data;
     },
@@ -240,13 +135,13 @@ export default {
     makePlaylist() {
       console.log('to do', this.selected);
     },
+
+    unauthorized() {
+      this.$emit('unauthorized');
+    },
   },
 
   async created() {
-    this.userInfo = await this.spotifyCall('https://api.spotify.com/v1/me');
-    this.topArtists = await this.spotifyCall('https://api.spotify.com/v1/me/top/artists', true);
-  	this.topTracks = await this.spotifyCall('https://api.spotify.com/v1/me/top/tracks', true);
-    this.topCombined = this.topArtists.map((element, index) => [element, this.topTracks[index]]).flat();
   }
 }
 </script>
@@ -318,69 +213,10 @@ export default {
       }
     }
   }
-  #user-info {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    width: auto;
-    padding: 5px;
-    justify-content: center;
-    #user-info-text {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 5px;
-    }
-    #user-image {
-      padding: 5px;
-      max-height: 100px;
-      border-radius: 50%;
-    }
-    #user-name {
-      font-size: 16px;
-    }
-    #user-info-row {
-      display: flex;
-      align-items: center;
-      font-size: 12px;
-      white-space: nowrap;
-      #user-info-separator {
-        font-size: 20px;
-        padding: 4px;
-      }
-    }
-  }
   #playlist-builder-options {
     display: flex;
     height: 100vh;
     overflow: scroll;
-    #playlist-options {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      .playlist-item {
-        height: 100px;
-        width: 100px;
-        background-repeat: no-repeat;
-        background-size: cover;
-        cursor: pointer;
-        .playlist-item-title {
-          flex-direction: column;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          height: 100%;
-          width: 100%;
-          background: #fff;
-          font-size: 12px;
-          opacity: .9;
-          overflow: hidden;
-        }
-      }
-      .playlist-item-disabled {
-        cursor: not-allowed;
-      }
-    }
   }
 }
 
@@ -423,9 +259,6 @@ body::-webkit-scrollbar {
 @media screen and (max-width: 600px) {
   #playlist-builder-container {
     flex-direction: column;
-  }
-  #user-image {
-    max-height: 50px !important;
   }
   .playlist-item {
     height: 50px !important;
