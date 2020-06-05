@@ -22,12 +22,12 @@
           </multiselect>
         </div>
         <div id="playlist-builder-selection" class="playlist-builder-row">
-          <span class="playlist-builder-option-text">Playlist options:</span>
+          <span class="playlist-builder-option-text">Playlist seeds:</span>
           <vue-tags-input
             v-model="tag"
             :tags="selected"
             :max-tags="maxOptions"
-            :placeholder="tagPlaceholder"
+            :placeholder="!maxOptionsSelected ? tagPlaceholder : ''"
             :class="{'show-error': showError}"
             @tags-changed="newTags => tags = newTags"
             @before-deleting-tag="deleteTag"
@@ -91,6 +91,7 @@
 import axios from 'axios'
 import UserInfo from './UserInfo.vue'
 import PlaylistOptions from './PlaylistOptions.vue'
+import VueCookies from 'vue-cookies'
 
 export default {
   name: 'PlaylistBuilder',
@@ -106,7 +107,7 @@ export default {
       selected: [],
       isLoading: false,
       maxOptions: 5,
-      tagPlaceholder: '',
+      tagPlaceholder: 'Select artists or tracks',
       playlistName: '',
       playlistOptions: [
         { name: 'custom', label: 'Custom playlist' },
@@ -198,6 +199,11 @@ export default {
       }
 
       this.isLoading = true;
+
+      if (!this.userId) {
+        this.userId = VueCookies.get('user_id');
+      }
+
       let artists = [];
       let tracks = [];
       let names = [];
@@ -323,11 +329,16 @@ export default {
           }
           .ti-input {
             border-radius: 5px;
+            border: 1px solid #e8e8e8;
           }
           &.show-error {
             .ti-input {
               border: 1px solid red;
             }
+          }
+          .ti-new-tag-input {
+            font-family: Avenir,Helvetica,Arial,sans-serif;
+            font-size: 12px;
           }
         }
       }
@@ -342,12 +353,12 @@ export default {
         padding-right: 5px;
       }
       #playlist-builder-name {
-        border: 1px solid #ccc;
+        border: 1px solid #e8e8e8;;
         font-family: Avenir,Helvetica,Arial,sans-serif;
         font-size: 12px;
         padding-left: 10px;
         border-radius: 5px;
-        height: 40px;
+        height: 33px;
         outline: none;
         width: 100%;
       }
@@ -359,7 +370,7 @@ export default {
         background-color: white;
         color: #2c3e50;
         cursor: pointer;
-        border: 1px solid #ccc;
+        border: 1px solid #e8e8e8;
         margin: 5px;
       }
 
@@ -394,8 +405,15 @@ body::-webkit-scrollbar, #builder-row::-webkit-scrollbar, #playlist-builder-opti
 
 .multiselect {
   min-width: 150px;
+  max-height: 33px;
+  min-height: 20px;
+  .multiselect__select {
+    top: -3px;
+  }
   .multiselect__tags {
     min-height: 20px;
+    max-height: 33px;
+    padding: 6px 40px 0 6px;
   }
   .multiselect__content-wrapper {
     overflow-x: hidden;

@@ -136,4 +136,10 @@ export default {
     max-height: 50px !important;
   }
 }
+
+@media screen and (max-height: 450px) {
+  #user-image {
+    max-height: 50px !important;
+  }
+}
 </style>

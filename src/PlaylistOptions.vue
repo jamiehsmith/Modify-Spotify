@@ -11,20 +11,20 @@
       v-on:mouseleave="showInfo(null)"
       v-on:click.prevent="clickItem(item)"
     >
-      <div class="playlist-item-title"
-       v-if="hoveredOn === item.id"
-      >
-        <b>{{ item.type.toUpperCase() }}</b>
-        <br>
-        <span v-if="item.type === 'track' && item.artists && item.artists.length && item.artists[0].name">
-          {{ item.name }} by {{ item.artists[0].name }}
-        </span>
-        <span v-else>
-          {{ item.name }}
-        </span>
-      </div>
       <div class="playlist-item-selected" v-if="isSelected(item)">
         <img class="playlist-selected-checkmark" src="./assets/checkmark.png"/>
+        <div class="playlist-item-title"
+         v-if="hoveredOn === item.id"
+        >
+          <b>{{ item.type.toUpperCase() }}</b>
+          <br>
+          <span> {{ titleCard(item) }} </span>
+        </div>
+      </div>
+      <div v-else-if="hoveredOn === item.id" class="playlist-item-title">
+        <b>{{ item.type.toUpperCase() }}</b>
+        <br>
+        <span> {{ titleCard(item) }} </span>
       </div>
     </div>
   </div>
@@ -89,6 +89,14 @@ export default {
           && item.album.images && item.album.images.length) {
         return `url(${item.album.images[0].url})`;
       }
+    },
+
+    titleCard(item) {
+      if (item.type === 'track' && item.artists && item.artists.length && item.artists[0].name) {
+        return `${item.name} by ${item.artists[0].name}`
+      }
+
+      return item.name;
     },
 
     showInfo(id) {
