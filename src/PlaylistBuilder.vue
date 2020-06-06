@@ -4,6 +4,7 @@
       <UserInfo
         :accessToken="accessToken"
         @unauthorized="unauthorized"
+        @setUserId="setUserId"
       />
       <div id="playlist-builder">
         <span id="playlist-builder-title">Playlist Builder</span>
@@ -143,6 +144,12 @@ export default {
   },
 
   methods: {
+    setUserId(value) {
+      if (!this.userId) {
+        this.userId = value;
+      }
+    },
+
     deleteTag(params) {
       this.selected = this.selected.filter(x => x.id !== params.tag.text.id);
     },
@@ -301,7 +308,9 @@ export default {
     flex-direction: column;
     justify-content: center;
     min-width: 300px;
-    overflow: scroll;
+    overflow-y: scroll;
+    height: 100vh;
+    z-index: 2;
     #playlist-builder {
       display: flex;
       flex-direction: column;

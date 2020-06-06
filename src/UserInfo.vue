@@ -92,6 +92,7 @@ export default {
 
   async created() {
     this.userInfo = await this.meCall();
+    this.$emit('setUserId', this.userInfo.id);
     VueCookies.set('user_id', this.userInfo.id);
   }
 }
