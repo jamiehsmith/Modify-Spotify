@@ -153,6 +153,8 @@ export default {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  align-content: flex-start;
+  overflow: scroll;
   .playlist-item {
     height: 100px;
     width: 100px;

@@ -408,7 +408,7 @@ body {
   overflow: hidden;
 }
 
-body::-webkit-scrollbar, #builder-row::-webkit-scrollbar, #playlist-builder-options::-webkit-scrollbar {
+body::-webkit-scrollbar, #builder-row::-webkit-scrollbar, #playlist-builder-options::-webkit-scrollbar, #playlist-options::-webkit-scrollbar {
     display: none;
 }
 
@@ -491,6 +491,12 @@ body::-webkit-scrollbar, #builder-row::-webkit-scrollbar, #playlist-builder-opti
 @media screen and (max-width: 600px) {
   #playlist-builder-container {
     flex-direction: column;
+    #builder-row {
+      height: 100%;
+      height: -moz-available;          /* WebKit-based browsers will ignore this. */
+      height: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */
+      height: fill-available;
+    }
   }
   .playlist-item {
     height: 50px !important;
