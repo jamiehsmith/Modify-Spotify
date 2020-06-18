@@ -28,23 +28,18 @@
 </template>
 
 <script>
-import axios from 'axios'
-import VueCookies from 'vue-cookies'
-
 export default {
   name: 'UserInfo',
-
-   data () {
-    return {
-      userInfo: {},
-    }
-  },
 
   props: {
     accessToken: {
       type: String,
       required: true,
-    }
+    },
+    userInfo: {
+      type: Object,
+      required: true,
+    },
   },
 
   computed: {
@@ -70,31 +65,6 @@ export default {
       } 
     },
   },
-
-  methods: {
-    async meCall(url) {
-      const self = this;
-      let data = [];
-
-      await axios.get('https://api.spotify.com/v1/me', {
-        headers: {
-          Authorization: 'Bearer ' + this.accessToken
-        }
-      }).then(function (response) {
-        data = response.data;
-      })
-      .catch(function (error) {
-        self.$emit('unauthorized');
-      });
-      return data;
-    },
-  },
-
-  async created() {
-    this.userInfo = await this.meCall();
-    this.$emit('setUserId', this.userInfo.id);
-    VueCookies.set('user_id', this.userInfo.id);
-  }
 }
 </script>
 

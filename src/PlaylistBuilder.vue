@@ -3,8 +3,7 @@
     <div id="builder-row">
       <UserInfo
         :accessToken="accessToken"
-        @unauthorized="unauthorized"
-        @setUserId="setUserId"
+        :userInfo="userInfo"
       />
       <div id="playlist-builder">
         <span id="playlist-builder-title">Playlist Builder</span>
@@ -103,7 +102,8 @@ export default {
   },
 
    data () {
-	  return {
+    return {
+      userInfo: {},
       tag: '',
       selected: [],
       isLoading: false,
@@ -144,10 +144,21 @@ export default {
   },
 
   methods: {
-    setUserId(value) {
-      if (!this.userId) {
-        this.userId = value;
-      }
+    async meCall(url) {
+      const self = this;
+      let data = [];
+
+      await axios.get('https://api.spotify.com/v1/me', {
+        headers: {
+          Authorization: 'Bearer ' + this.accessToken
+        }
+      }).then(function (response) {
+        data = response.data;
+      })
+      .catch(function (error) {
+        self.unauthorized();
+      });
+      return data;
     },
 
     deleteTag(params) {
@@ -298,6 +309,11 @@ export default {
       })
     },
   },
+  async created() {
+    this.userInfo = await this.meCall();
+    this.userId = this.userInfo.id;
+    VueCookies.set('user_id', this.userInfo.id);
+  }
 }
 </script>
 
@@ -350,6 +366,10 @@ export default {
           .ti-new-tag-input {
             font-family: Avenir,Helvetica,Arial,sans-serif;
             font-size: 12px;
+          }
+          .ti-new-tag-input-wrapper {
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
         }
       }

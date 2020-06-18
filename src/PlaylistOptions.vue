@@ -1,30 +1,48 @@
 <template>
-  <div id="playlist-options">
-    <div
-      :class="{
-        'playlist-item': true,
-        'playlist-item-disabled': maxOptionsSelected && !isSelected(item)
-      }"
-      v-for="item in topCombined" :key="item"
-      v-bind:style="{ backgroundImage: itemBackground(item) }"
-      v-on:mouseenter="showInfo(item.id)"
-      v-on:mouseleave="showInfo(null)"
-      v-on:click.prevent="clickItem(item)"
-    >
-      <div class="playlist-item-selected" v-if="isSelected(item)">
-        <img class="playlist-selected-checkmark" src="./assets/checkmark.png"/>
-        <div class="playlist-item-title"
-         v-if="hoveredOn === item.id"
-        >
+  <div>
+    <div id="selection-options">
+      Here are your top tracks:
+      <multiselect
+        v-model="selectionValue"
+        track-by="name"
+        label="label"
+        class="selection-options-dropdown"
+        :options="selectionOptions"
+        :searchable="false"
+        :close-on-select="true"
+        :show-labels="false"
+        :allow-empty="false"
+        @input="getSeedOptions"
+      >
+      </multiselect>
+    </div>
+    <div id="playlist-options">
+      <div
+        :class="{
+          'playlist-item': true,
+          'playlist-item-disabled': maxOptionsSelected && !isSelected(item)
+        }"
+        v-for="item in topCombined" :key="item"
+        v-bind:style="{ backgroundImage: itemBackground(item) }"
+        v-on:mouseenter="showInfo(item.id)"
+        v-on:mouseleave="showInfo(null)"
+        v-on:click.prevent="clickItem(item)"
+      >
+        <div class="playlist-item-selected" v-if="isSelected(item)">
+          <img class="playlist-selected-checkmark" src="./assets/checkmark.png"/>
+          <div class="playlist-item-title"
+           v-if="hoveredOn === item.id"
+          >
+            <b>{{ item.type.toUpperCase() }}</b>
+            <br>
+            <span> {{ titleCard(item) }} </span>
+          </div>
+        </div>
+        <div v-else-if="hoveredOn === item.id" class="playlist-item-title">
           <b>{{ item.type.toUpperCase() }}</b>
           <br>
           <span> {{ titleCard(item) }} </span>
         </div>
-      </div>
-      <div v-else-if="hoveredOn === item.id" class="playlist-item-title">
-        <b>{{ item.type.toUpperCase() }}</b>
-        <br>
-        <span> {{ titleCard(item) }} </span>
       </div>
     </div>
   </div>
@@ -43,6 +61,12 @@ export default {
       topCombined: [],
       hoveredOn: null,
       maxOptions: 5,
+      selectionOptions: [
+        { name: 'medium_term', label: 'Past 6 months' },
+        { name: 'short_term', label: 'Past month' },
+        { name: 'long_term', label: 'All time' }
+      ],
+      selectionValue: { name: 'medium_term', label: 'Past 6 months' },
   	}
   },
 
@@ -67,8 +91,18 @@ export default {
       if (type.name === 'top') {
         this.selected = this.topCombined.slice(0, 5);
       } else if (type.name === 'random') {
+        let randomNumber;
         for (let i = 0; i < 5; i++) {
-          this.selected.push(this.topCombined[Math.floor(Math.random() * this.topCombined.length)]);
+          randomNumber = Math.floor(Math.random() * this.topCombined.length);
+          if (!this.selected.includes(this.topCombined[randomNumber])) {
+            this.selected.push(this.topCombined[randomNumber]);
+          } else if (this.topCombined.length >= 5) {
+            // Restart interation for new pick
+            i -= 1;
+          } else {
+            // Less than 5 options, choose them all
+            this.selected = this.topCombined;
+          }
         }
       }
       this.$emit('selectedUpdated', this.selected);
@@ -122,11 +156,17 @@ export default {
       }
     },
 
+    async getSeedOptions() {
+      this.topArtists = await this.spotifyCall('https://api.spotify.com/v1/me/top/artists');
+      this.topTracks = await this.spotifyCall('https://api.spotify.com/v1/me/top/tracks');
+      this.topCombined = this.topArtists.map((element, index) => [element, this.topTracks[index]]).flat();
+    },
+
     async spotifyCall(url) {
       const self = this;
       let data = [];
 
-      await axios.get(`${url}?limit=50`, {
+      await axios.get(`${url}?limit=50&time_range=${this.selectionValue.name}`, {
         headers: {
           Authorization: 'Bearer ' + this.accessToken
         }
@@ -141,14 +181,23 @@ export default {
   },
 
   async created() {
-    this.topArtists = await this.spotifyCall('https://api.spotify.com/v1/me/top/artists');
-  	this.topTracks = await this.spotifyCall('https://api.spotify.com/v1/me/top/tracks');
-    this.topCombined = this.topArtists.map((element, index) => [element, this.topTracks[index]]).flat();
+    await this.getSeedOptions();
   }
 }
 </script>
 
 <style lang="scss">
+#selection-options {
+  font-size: 14px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  padding-bottom: 10px;
+  .selection-options-dropdown {
+    max-width: 100px;
+    padding-left: 5px;
+  }
+}
 #playlist-options {
   display: flex;
   flex-direction: row;
