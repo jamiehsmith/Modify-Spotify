@@ -62,4 +62,8 @@ export default {
 		}
 	}
 }
+
+html::-webkit-scrollbar {
+    display: none;
+}
 </style>

@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <img src="./assets/favicon.png" :style="{ height: '1px', width: '1px', display: 'none' }">
     <div v-if="isLoggedIn">
       <PlaylistBuilder
         :accessToken="accessToken"
@@ -11,7 +12,7 @@
       <Login/>
     </div>
     <div id="disclaimer">
-      Made by Jamie Smith - <a href="http://www.jamieistyping.com" target="_blank">www.jamieistyping.com</a>. This website is in no way affiliate with Spotify.
+      Made by Jamie Smith - <a href="http://www.jamieistyping.com" target="_blank">www.jamieistyping.com</a>. This website is not affiliate with Spotify.
     </div> 
   </div>
 </template>

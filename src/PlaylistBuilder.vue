@@ -282,6 +282,8 @@ export default {
       this.selected = [];
       this.showError = false;
       this.playlistValue = this.playlistOptions[0];
+      this.numberOfTracks = this.numberOfTracksOptions[0];
+      this.playlistName = '';
     },
 
     unauthorized() {
