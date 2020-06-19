@@ -182,6 +182,7 @@ export default {
 
   async created() {
     await this.getSeedOptions();
+    this.$emit('optionsUpdated', this.topCombined);
   }
 }
 </script>
@@ -204,6 +205,7 @@ export default {
   flex-wrap: wrap;
   align-content: flex-start;
   overflow: scroll;
+  margin-bottom: 35px;
   .playlist-item {
     height: 100px;
     width: 100px;

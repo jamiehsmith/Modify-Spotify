@@ -29,11 +29,16 @@
             :max-tags="maxOptions"
             :placeholder="!maxOptionsSelected ? tagPlaceholder : ''"
             :class="{'show-error': showError}"
-            @tags-changed="newTags => tags = newTags"
+            :autocomplete-items="filteredItems"
+            :add-only-from-autocomplete="true"
+            @tags-changed="updateTags"
             @before-deleting-tag="deleteTag"
           >
             <div slot="tag-center" slot-scope="props">
-              {{ props.tag.text.name }}
+              {{ props.tag.text.name || props.tag.text }}
+            </div>
+            <div slot="autocomplete-item" slot-scope="props">
+              {{ formatAutocompleteTag(props.item) }}
             </div>
           </vue-tags-input>
         </div>
@@ -82,6 +87,7 @@
         :playlistType="playlistValue"
         @selectedUpdated="updateSelected"
         @unauthorized="unauthorized"
+        @optionsUpdated="updateOptions"
       />
     </div>
   </div>
@@ -123,6 +129,7 @@ export default {
         { name: '100', label: '100' },
       ],
       showError: false,
+      options: [],
   	}
   },
 
@@ -140,6 +147,11 @@ export default {
   computed: {
     maxOptionsSelected() {
       return this.selected.length >= this.maxOptions;
+    },
+    filteredItems() {
+      return this.options.filter(i => {
+        return i.name.toLowerCase().indexOf(this.tag.toLowerCase()) !== -1;
+      });
     }
   },
 
@@ -161,8 +173,20 @@ export default {
       return data;
     },
 
+    formatAutocompleteTag(tag) {
+      if (tag.type === 'track') {
+        return `${tag.text} by ${tag.artists[0].name}`;
+      }
+      return tag.text;
+    },
+
     deleteTag(params) {
-      this.selected = this.selected.filter(x => x.id !== params.tag.text.id);
+      this.selected = this.selected.filter(x => x.id !== params.tag.text.id && x.id !== params.tag.id);
+    },
+
+    updateTags(input) {
+      this.showError = false;
+      this.selected.push(input[input.length -1]);
     },
 
     updateSelected(selected) {
@@ -301,6 +325,15 @@ export default {
       this.$emit('unauthorized');
     },
 
+    updateOptions(options) {
+      let allOptions = options.map(function(item) {
+        let i = Object.assign({}, item);
+        i.text = item.name;
+        return i;
+      });
+      this.options = allOptions;
+    },
+
     noSuggestions() {
       this.$swal({
         icon: 'error',
@@ -361,6 +394,11 @@ export default {
           &.show-error {
             .ti-input {
               border: 1px solid red;
+            }
+          }
+          .ti-autocomplete {
+            .ti-item {
+              background-color: lightpink;
             }
           }
           .ti-new-tag-input {
