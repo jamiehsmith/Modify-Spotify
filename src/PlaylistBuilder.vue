@@ -35,10 +35,10 @@
             @before-deleting-tag="deleteTag"
           >
             <div slot="tag-center" slot-scope="props">
-              {{ props.tag.text.name || props.tag.text }}
+              {{ formatTags(props.tag) }}
             </div>
             <div slot="autocomplete-item" slot-scope="props">
-              {{ formatAutocompleteTag(props.item) }}
+              {{ formatTags(props.item) }}
             </div>
           </vue-tags-input>
         </div>
@@ -173,9 +173,25 @@ export default {
       return data;
     },
 
+    formatTags(tag) {
+      if (tag.hasOwnProperty('text') && typeof tag.text === 'object') {
+        tag = tag.text;
+      }
+
+      if (tag.type === 'track') {
+        return this.formatTrack(tag);
+      }
+
+      return tag.name;
+    },
+
+    formatTrack(tag) {
+      return `${tag.name} by ${tag.artists[0].name}`;
+    },
+
     formatAutocompleteTag(tag) {
       if (tag.type === 'track') {
-        return `${tag.text} by ${tag.artists[0].name}`;
+        return this.formatTrack(tag);
       }
       return tag.text;
     },
@@ -326,12 +342,18 @@ export default {
     },
 
     updateOptions(options) {
+      let self = this;
       let allOptions = options.map(function(item) {
         let i = Object.assign({}, item);
         i.text = item.name;
         return i;
       });
-      this.options = allOptions;
+
+      allOptions.forEach(function(i) {
+        if (!self.options.some(x => x.id === i.id)) {
+          self.options.push(i);
+        }
+      });
     },
 
     noSuggestions() {
@@ -358,7 +380,7 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    min-width: 300px;
+    min-width: 315px;
     overflow-y: scroll;
     height: 100vh;
     z-index: 2;
@@ -383,9 +405,19 @@ export default {
       #playlist-builder-selection {
         width: 100%;
         .vue-tags-input {
-          width: 100%;
+          width: 74%;
           .ti-tag, ti-content {
             background-color: #04dc5c;
+          }
+          .ti-tag {
+            overflow-x: hidden;
+          }
+          .ti-content, .ti-tag-center {
+            width: 100%;
+          }
+          .ti-tag-center > div {
+            text-overflow: ellipsis;
+            overflow-x: hidden;
           }
           .ti-input {
             border-radius: 5px;
@@ -397,8 +429,20 @@ export default {
             }
           }
           .ti-autocomplete {
+            ul {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+            }
             .ti-item {
               background-color: lightpink;
+              width: fit-content;
+              margin: 1px;
+              max-width: 100%;
+              div {
+                text-overflow: ellipsis;
+                overflow: hidden;
+              }
             }
           }
           .ti-new-tag-input {

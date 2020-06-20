@@ -160,6 +160,8 @@ export default {
       this.topArtists = await this.spotifyCall('https://api.spotify.com/v1/me/top/artists');
       this.topTracks = await this.spotifyCall('https://api.spotify.com/v1/me/top/tracks');
       this.topCombined = this.topArtists.map((element, index) => [element, this.topTracks[index]]).flat();
+
+      this.$emit('optionsUpdated', this.topCombined);
     },
 
     async spotifyCall(url) {
@@ -182,7 +184,6 @@ export default {
 
   async created() {
     await this.getSeedOptions();
-    this.$emit('optionsUpdated', this.topCombined);
   }
 }
 </script>
