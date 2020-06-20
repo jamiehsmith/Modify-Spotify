@@ -157,9 +157,16 @@ export default {
     },
 
     async getSeedOptions() {
+      const self = this;
       this.topArtists = await this.spotifyCall('https://api.spotify.com/v1/me/top/artists');
       this.topTracks = await this.spotifyCall('https://api.spotify.com/v1/me/top/tracks');
       this.topCombined = this.topArtists.map((element, index) => [element, this.topTracks[index]]).flat();
+
+      this.selected.forEach(function(item) {
+        if (!self.topCombined.some(x => x.id === item.id)) {
+          self.topCombined.push(item);
+        }
+      })
 
       this.$emit('optionsUpdated', this.topCombined);
     },
