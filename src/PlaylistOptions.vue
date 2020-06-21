@@ -1,7 +1,7 @@
 <template>
   <div>
     <div id="selection-options">
-      Here are your top tracks:
+      Here are your top artists and tracks:
       <multiselect
         v-model="selectionValue"
         track-by="name"
@@ -197,7 +197,7 @@ export default {
 
 <style lang="scss">
 #selection-options {
-  font-size: 14px;
+  font-size: 13px;
   text-align: left;
   display: flex;
   align-items: center;

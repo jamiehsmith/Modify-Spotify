@@ -412,6 +412,9 @@ export default {
           .ti-tag {
             overflow-x: hidden;
           }
+          .ti-content {
+            overflow: hidden;
+          }
           .ti-content, .ti-tag-center {
             width: 100%;
           }
@@ -605,6 +608,9 @@ body::-webkit-scrollbar, #builder-row::-webkit-scrollbar, #playlist-builder-opti
   .playlist-item {
     height: 50px !important;
     width: 50px !important;
+  }
+  #selection-options {
+    font-size: 12px !important;
   }
 }
 </style>
