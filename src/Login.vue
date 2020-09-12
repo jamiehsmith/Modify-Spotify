@@ -19,7 +19,7 @@ export default {
 
    data () {
 	return {
-		infoText: "View your top artists, tracks and genres, and generate playlists utilizing Spotify's recommendation engine.",
+		infoText: "View your top artists and tracks, and make playlists utilizing Spotify's recommendation engine.",
 	}
   },
 

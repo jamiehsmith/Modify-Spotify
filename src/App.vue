@@ -12,7 +12,7 @@
       <Login/>
     </div>
     <div id="disclaimer">
-      Made by Jamie Smith - <a href="http://www.jamieistyping.com" target="_blank">www.jamieistyping.com</a>. This website is not affiliated with Spotify.
+      Made by <a href="http://www.jamieistyping.com" target="_blank">Jamie Smith</a>. This website is not affiliated with Spotify.
     </div> 
   </div>
 </template>
