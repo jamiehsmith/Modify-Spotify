@@ -25,12 +25,12 @@ export default {
   props: {
     accessToken: {
       type: String,
-      required: true,
+      required: true
     },
     userInfo: {
       type: Object,
-      required: true,
-    },
+      required: true
+    }
   },
 
   computed: {
@@ -54,12 +54,12 @@ export default {
       if (this.userInfo.external_urls && this.userInfo.external_urls.spotify) {
         return this.userInfo.external_urls.spotify;
       }
-    },
-  },
+    }
+  }
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 #user-info {
   display: flex;
   flex-direction: row;

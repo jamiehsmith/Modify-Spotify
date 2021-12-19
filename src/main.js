@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import App from './App.vue';
+import App from './components/App.vue';
 import babelPolyfill from 'babel-polyfill';
 import Multiselect from 'vue-multiselect';
 import VueTagsInput from '@johmun/vue-tags-input';

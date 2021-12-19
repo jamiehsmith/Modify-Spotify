@@ -5,8 +5,8 @@
       <h4>
         {{ infoText }}
       </h4>
-      <button v-on:click="clickLogin()" id="login-button">
-        <img id="spotify-logo" src="./assets/spotify_logo.png" />
+      <button @click="clickLogin" id="login-button">
+        <img id="spotify-logo" src="../assets/spotify_logo.png" />
         <span id="login-button-text">Login with Spotify</span>
       </button>
     </div>
@@ -20,19 +20,19 @@ export default {
   data() {
     return {
       infoText:
-        "View your top artists and tracks, and make playlists utilizing Spotify's recommendation engine.",
+        "View your top artists and tracks, and make playlists utilizing Spotify's recommendation engine."
     };
   },
 
   methods: {
-    clickLogin: function () {
+    clickLogin() {
       window.location = '/login';
-    },
-  },
+    }
+  }
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 #login {
   #login-text {
     display: flex;
@@ -42,7 +42,6 @@ export default {
       margin-top: 30px;
       outline: none;
       display: flex;
-      flex-direction: row;
       align-items: center;
       justify-content: center;
       width: auto;

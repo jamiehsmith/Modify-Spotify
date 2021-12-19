@@ -20,7 +20,7 @@
       <div
         :class="{
           'playlist-item': true,
-          'playlist-item-disabled': maxOptionsSelected && !isSelected(item),
+          'playlist-item-disabled': maxOptionsSelected && !isSelected(item)
         }"
         v-for="item in topCombined"
         :key="item"
@@ -32,7 +32,7 @@
         <div class="playlist-item-selected" v-if="isSelected(item)">
           <img
             class="playlist-selected-checkmark"
-            src="./assets/checkmark.png"
+            src="../assets/checkmark.png"
           />
           <div class="playlist-item-title" v-if="hoveredOn === item.id">
             <b>{{ item.type.toUpperCase() }}</b>
@@ -66,29 +66,29 @@ export default {
       selectionOptions: [
         { name: 'medium_term', label: 'Past 6 months' },
         { name: 'short_term', label: 'Past month' },
-        { name: 'long_term', label: 'All time' },
+        { name: 'long_term', label: 'All time' }
       ],
-      selectionValue: { name: 'medium_term', label: 'Past 6 months' },
+      selectionValue: { name: 'medium_term', label: 'Past 6 months' }
     };
   },
 
   props: {
     accessToken: {
       type: String,
-      required: true,
+      required: true
     },
     selected: {
       type: Array,
-      required: true,
+      required: true
     },
     playlistType: {
       type: Object,
-      required: true,
-    },
+      required: true
+    }
   },
 
   watch: {
-    playlistType: function (type) {
+    playlistType(type) {
       this.selected = [];
       if (type.name === 'top') {
         this.selected = this.topCombined.slice(0, 5);
@@ -108,13 +108,13 @@ export default {
         }
       }
       this.$emit('selectedUpdated', this.selected);
-    },
+    }
   },
 
   computed: {
     maxOptionsSelected() {
       return this.selected.length >= this.maxOptions;
-    },
+    }
   },
 
   methods: {
@@ -149,13 +149,13 @@ export default {
     },
 
     isSelected(item) {
-      return this.selected.some((x) => x['id'] === item.id);
+      return this.selected.some(x => x['id'] === item.id);
     },
 
     clickItem(item) {
       let selectedChanged = false;
       if (this.isSelected(item)) {
-        this.selected = this.selected.filter((x) => x.id !== item.id);
+        this.selected = this.selected.filter(x => x.id !== item.id);
         selectedChanged = true;
       } else if (this.selected.length < this.maxOptions) {
         this.selected.push(item);
@@ -168,7 +168,6 @@ export default {
     },
 
     async getSeedOptions() {
-      const self = this;
       this.topArtists = await this.spotifyCall(
         'https://api.spotify.com/v1/me/top/artists'
       );
@@ -179,9 +178,9 @@ export default {
         .map((element, index) => [element, this.topTracks[index]])
         .flat();
 
-      this.selected.forEach(function (item) {
-        if (!self.topCombined.some((x) => x.id === item.id)) {
-          self.topCombined.push(item);
+      this.selected.forEach(item => {
+        if (!this.topCombined.some(x => x.id === item.id)) {
+          this.topCombined.push(item);
         }
       });
 
@@ -189,32 +188,31 @@ export default {
     },
 
     async spotifyCall(url) {
-      const self = this;
       let data = [];
 
       await axios
         .get(`${url}?limit=50&time_range=${this.selectionValue.name}`, {
           headers: {
-            Authorization: 'Bearer ' + this.accessToken,
-          },
+            Authorization: 'Bearer ' + this.accessToken
+          }
         })
-        .then(function (response) {
+        .then(response => {
           data = response.data.items;
         })
-        .catch(function (error) {
-          self.$emit('unauthorized');
+        .catch(error => {
+          this.$emit('unauthorized');
         });
       return data;
-    },
+    }
   },
 
   async created() {
     await this.getSeedOptions();
-  },
+  }
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 #selection-options {
   font-size: 13px;
   text-align: left;
