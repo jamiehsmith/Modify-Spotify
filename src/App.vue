@@ -1,6 +1,9 @@
 <template>
   <div id="app">
-    <img src="./assets/favicon.png" :style="{ height: '1px', width: '1px', display: 'none' }">
+    <img
+      src="./assets/favicon.png"
+      :style="{ height: '1px', width: '1px', display: 'none' }"
+    />
     <div v-if="isLoggedIn">
       <PlaylistBuilder
         :accessToken="accessToken"
@@ -9,18 +12,20 @@
       />
     </div>
     <div v-else id="app-login">
-      <Login/>
+      <Login />
     </div>
     <div id="disclaimer">
-      Made by <a href="http://www.jamieistyping.com" target="_blank">Jamie Smith</a>. This website is not affiliated with Spotify.
-    </div> 
+      Made by
+      <a href="http://www.jamieistyping.com" target="_blank">Jamie Smith</a>.
+      This website is not affiliated with Spotify.
+    </div>
   </div>
 </template>
 
 <script>
-import Login from './Login.vue'
-import PlaylistBuilder from './PlaylistBuilder.vue'
-import VueCookies from 'vue-cookies'
+import Login from './Login.vue';
+import PlaylistBuilder from './PlaylistBuilder.vue';
+import VueCookies from 'vue-cookies';
 
 export default {
   name: 'app',
@@ -30,28 +35,28 @@ export default {
     Login,
   },
 
-  data () {
+  data() {
     return {
       accessToken: '',
       refreshToken: '',
       userId: null,
-    }
+    };
   },
 
   computed: {
     isLoggedIn() {
       return this.accessToken.length ? true : false;
-    }
+    },
   },
 
   methods: {
-    resetAccessToken: function() {
+    resetAccessToken: function () {
       if (this.refreshToken) {
-        window.location = "/refresh_token";
+        window.location = '/refresh_token';
       } else {
         this.accessToken = '';
       }
-    }
+    },
   },
 
   mounted() {
@@ -66,12 +71,13 @@ export default {
     if (VueCookies.get('user_id')) {
       this.userId = VueCookies.get('user_id');
     }
-  }
-}
+  },
+};
 </script>
 
 <style lang="scss">
-html, body {
+html,
+body {
   height: 100%;
 }
 #app {
@@ -92,7 +98,8 @@ html, body {
   }
 }
 
-h1, h2 {
+h1,
+h2 {
   font-weight: normal;
 }
 
@@ -110,12 +117,12 @@ a {
   color: #04dc5c;
 }
 
-  #disclaimer {
-    position: fixed;
-    bottom: 0px;
-    width: 100%;
-    padding: 10px 0;
-    font-size: 12px;
-    background: #fff;
-  }
+#disclaimer {
+  position: fixed;
+  bottom: 0px;
+  width: 100%;
+  padding: 10px 0;
+  font-size: 12px;
+  background: #fff;
+}
 </style>

@@ -1,22 +1,13 @@
 <template>
   <div id="user-info">
-    <img id="user-image"
-      :v-if="userImage"
-      :src="userImage"
-    />
+    <img id="user-image" :v-if="userImage" :src="userImage" />
     <div id="user-info-text">
-      <span id="user-name" 
-        :v-if="userInfo.display_name"
-      >
+      <span id="user-name" :v-if="userInfo.display_name">
         {{ userInfo.display_name }}
       </span>
       <span id="user-info-row">
-        <span :v-if="userFollowers">
-          Followers: {{ userFollowers }}
-        </span>
-        <span id="user-info-separator"
-          :v-if="userFollowers && userProfileUrl"
-        >
+        <span :v-if="userFollowers"> Followers: {{ userFollowers }} </span>
+        <span id="user-info-separator" :v-if="userFollowers && userProfileUrl">
           &middot;
         </span>
         <span :v-if="userProfileUrl">
@@ -62,10 +53,10 @@ export default {
     userProfileUrl() {
       if (this.userInfo.external_urls && this.userInfo.external_urls.spotify) {
         return this.userInfo.external_urls.spotify;
-      } 
+      }
     },
   },
-}
+};
 </script>
 
 <style lang="scss">

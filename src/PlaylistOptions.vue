@@ -20,27 +20,29 @@
       <div
         :class="{
           'playlist-item': true,
-          'playlist-item-disabled': maxOptionsSelected && !isSelected(item)
+          'playlist-item-disabled': maxOptionsSelected && !isSelected(item),
         }"
-        v-for="item in topCombined" :key="item"
+        v-for="item in topCombined"
+        :key="item"
         v-bind:style="{ backgroundImage: itemBackground(item) }"
         v-on:mouseenter="showInfo(item.id)"
         v-on:mouseleave="showInfo(null)"
         v-on:click.prevent="clickItem(item)"
       >
         <div class="playlist-item-selected" v-if="isSelected(item)">
-          <img class="playlist-selected-checkmark" src="./assets/checkmark.png"/>
-          <div class="playlist-item-title"
-           v-if="hoveredOn === item.id"
-          >
+          <img
+            class="playlist-selected-checkmark"
+            src="./assets/checkmark.png"
+          />
+          <div class="playlist-item-title" v-if="hoveredOn === item.id">
             <b>{{ item.type.toUpperCase() }}</b>
-            <br>
+            <br />
             <span> {{ titleCard(item) }} </span>
           </div>
         </div>
         <div v-else-if="hoveredOn === item.id" class="playlist-item-title">
           <b>{{ item.type.toUpperCase() }}</b>
-          <br>
+          <br />
           <span> {{ titleCard(item) }} </span>
         </div>
       </div>
@@ -49,13 +51,13 @@
 </template>
 
 <script>
-import axios from 'axios'
+import axios from 'axios';
 
 export default {
   name: 'PlaylistBuilder',
 
-  data () {
-	  return {
+  data() {
+    return {
       topArtists: [],
       topTracks: [],
       topCombined: [],
@@ -64,17 +66,17 @@ export default {
       selectionOptions: [
         { name: 'medium_term', label: 'Past 6 months' },
         { name: 'short_term', label: 'Past month' },
-        { name: 'long_term', label: 'All time' }
+        { name: 'long_term', label: 'All time' },
       ],
       selectionValue: { name: 'medium_term', label: 'Past 6 months' },
-  	}
+    };
   },
 
   props: {
-  	accessToken: {
+    accessToken: {
       type: String,
       required: true,
-  	},
+    },
     selected: {
       type: Array,
       required: true,
@@ -82,12 +84,12 @@ export default {
     playlistType: {
       type: Object,
       required: true,
-    }
+    },
   },
 
   watch: {
-    'playlistType': function(type) {
-      this.selected =[];
+    playlistType: function (type) {
+      this.selected = [];
       if (type.name === 'top') {
         this.selected = this.topCombined.slice(0, 5);
       } else if (type.name === 'random') {
@@ -106,28 +108,37 @@ export default {
         }
       }
       this.$emit('selectedUpdated', this.selected);
-    }
+    },
   },
 
   computed: {
     maxOptionsSelected() {
       return this.selected.length >= this.maxOptions;
-    }
+    },
   },
 
   methods: {
     itemBackground(item) {
       if (item.type === 'artist' && item.images && item.images.length) {
         return `url(${item.images[0].url})`;
-      } else if (item.type === 'track' && item.album
-          && item.album.images && item.album.images.length) {
+      } else if (
+        item.type === 'track' &&
+        item.album &&
+        item.album.images &&
+        item.album.images.length
+      ) {
         return `url(${item.album.images[0].url})`;
       }
     },
 
     titleCard(item) {
-      if (item.type === 'track' && item.artists && item.artists.length && item.artists[0].name) {
-        return `${item.name} by ${item.artists[0].name}`
+      if (
+        item.type === 'track' &&
+        item.artists &&
+        item.artists.length &&
+        item.artists[0].name
+      ) {
+        return `${item.name} by ${item.artists[0].name}`;
       }
 
       return item.name;
@@ -138,13 +149,13 @@ export default {
     },
 
     isSelected(item) {
-      return this.selected.some(x => x['id'] === item.id);
+      return this.selected.some((x) => x['id'] === item.id);
     },
 
     clickItem(item) {
       let selectedChanged = false;
       if (this.isSelected(item)) {
-        this.selected = this.selected.filter(x => x.id !== item.id);
+        this.selected = this.selected.filter((x) => x.id !== item.id);
         selectedChanged = true;
       } else if (this.selected.length < this.maxOptions) {
         this.selected.push(item);
@@ -158,15 +169,21 @@ export default {
 
     async getSeedOptions() {
       const self = this;
-      this.topArtists = await this.spotifyCall('https://api.spotify.com/v1/me/top/artists');
-      this.topTracks = await this.spotifyCall('https://api.spotify.com/v1/me/top/tracks');
-      this.topCombined = this.topArtists.map((element, index) => [element, this.topTracks[index]]).flat();
+      this.topArtists = await this.spotifyCall(
+        'https://api.spotify.com/v1/me/top/artists'
+      );
+      this.topTracks = await this.spotifyCall(
+        'https://api.spotify.com/v1/me/top/tracks'
+      );
+      this.topCombined = this.topArtists
+        .map((element, index) => [element, this.topTracks[index]])
+        .flat();
 
-      this.selected.forEach(function(item) {
-        if (!self.topCombined.some(x => x.id === item.id)) {
+      this.selected.forEach(function (item) {
+        if (!self.topCombined.some((x) => x.id === item.id)) {
           self.topCombined.push(item);
         }
-      })
+      });
 
       this.$emit('optionsUpdated', this.topCombined);
     },
@@ -175,24 +192,26 @@ export default {
       const self = this;
       let data = [];
 
-      await axios.get(`${url}?limit=50&time_range=${this.selectionValue.name}`, {
-        headers: {
-          Authorization: 'Bearer ' + this.accessToken
-        }
-      }).then(function (response) {
-        data = response.data.items;
-      })
-      .catch(function (error) {
-        self.$emit('unauthorized');
-      });
+      await axios
+        .get(`${url}?limit=50&time_range=${this.selectionValue.name}`, {
+          headers: {
+            Authorization: 'Bearer ' + this.accessToken,
+          },
+        })
+        .then(function (response) {
+          data = response.data.items;
+        })
+        .catch(function (error) {
+          self.$emit('unauthorized');
+        });
       return data;
     },
   },
 
   async created() {
     await this.getSeedOptions();
-  }
-}
+  },
+};
 </script>
 
 <style lang="scss">
@@ -229,7 +248,7 @@ export default {
       width: 100%;
       background: #fff;
       font-size: 12px;
-      opacity: .9;
+      opacity: 0.9;
       overflow: hidden;
     }
     .playlist-item-selected {

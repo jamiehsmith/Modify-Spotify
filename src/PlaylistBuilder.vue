@@ -1,10 +1,7 @@
 <template>
   <div id="playlist-builder-container">
     <div id="builder-row">
-      <UserInfo
-        :accessToken="accessToken"
-        :userInfo="userInfo"
-      />
+      <UserInfo :accessToken="accessToken" :userInfo="userInfo" />
       <div id="playlist-builder">
         <span id="playlist-builder-title">Playlist Builder</span>
         <div class="playlist-builder-row">
@@ -28,7 +25,7 @@
             :tags="selected"
             :max-tags="maxOptions"
             :placeholder="!maxOptionsSelected ? tagPlaceholder : ''"
-            :class="{'show-error': showError}"
+            :class="{ 'show-error': showError }"
             :autocomplete-items="filteredItems"
             :add-only-from-autocomplete="true"
             @tags-changed="updateTags"
@@ -43,12 +40,12 @@
           </vue-tags-input>
         </div>
         <div v-if="showError" class="playlist-builder-row">
-          <span id="error-text">This field cannot be empty. Choose artist(s) and/or track(s) from the right.</span>
+          <span id="error-text"
+            >This field cannot be empty. Choose artist(s) and/or track(s) from
+            the right.</span
+          >
         </div>
-        <div
-          id="playlist-builder-max-selected"
-          v-if="maxOptionsSelected"
-        >
+        <div id="playlist-builder-max-selected" v-if="maxOptionsSelected">
           Maximum of 5 options selected.
         </div>
         <div class="playlist-builder-row">
@@ -67,12 +64,24 @@
         </div>
         <div class="playlist-builder-row">
           <span class="playlist-builder-option-text">Playlist name:</span>
-          <input id="playlist-builder-name" v-model="playlistName" placeholder="Enter name">
+          <input
+            id="playlist-builder-name"
+            v-model="playlistName"
+            placeholder="Enter name"
+          />
         </div>
         <div class="playlist-builder-row">
-          <button v-on:click.prevent="makePlaylist" :disabled="isLoading" id="make-playlist-button">
+          <button
+            v-on:click.prevent="makePlaylist"
+            :disabled="isLoading"
+            id="make-playlist-button"
+          >
             <span>Make Playlist</span>
-            <img id="playlist-loading-icon" v-if="isLoading" src="./assets/loading.gif"/>
+            <img
+              id="playlist-loading-icon"
+              v-if="isLoading"
+              src="./assets/loading.gif"
+            />
           </button>
           <button v-on:click="reset" id="reset-playlist-button">
             <span>Reset</span>
@@ -94,10 +103,10 @@
 </template>
 
 <script>
-import axios from 'axios'
-import UserInfo from './UserInfo.vue'
-import PlaylistOptions from './PlaylistOptions.vue'
-import VueCookies from 'vue-cookies'
+import axios from 'axios';
+import UserInfo from './UserInfo.vue';
+import PlaylistOptions from './PlaylistOptions.vue';
+import VueCookies from 'vue-cookies';
 
 export default {
   name: 'PlaylistBuilder',
@@ -107,7 +116,7 @@ export default {
     PlaylistOptions,
   },
 
-   data () {
+  data() {
     return {
       userInfo: {},
       tag: '',
@@ -119,7 +128,7 @@ export default {
       playlistOptions: [
         { name: 'custom', label: 'Custom playlist' },
         { name: 'top', label: 'Top artists and songs' },
-        { name: 'random', label: 'Surprise me!' }
+        { name: 'random', label: 'Surprise me!' },
       ],
       playlistValue: { name: 'custom', label: 'Custom playlist' },
       numberOfTracks: { name: '25', label: '25' },
@@ -130,18 +139,18 @@ export default {
       ],
       showError: false,
       options: [],
-  	}
+    };
   },
 
   props: {
-  	accessToken: {
+    accessToken: {
       type: String,
       required: true,
     },
     userId: {
       type: Number,
       required: true,
-    }
+    },
   },
 
   computed: {
@@ -149,10 +158,10 @@ export default {
       return this.selected.length >= this.maxOptions;
     },
     filteredItems() {
-      return this.options.filter(i => {
+      return this.options.filter((i) => {
         return i.name.toLowerCase().indexOf(this.tag.toLowerCase()) !== -1;
       });
-    }
+    },
   },
 
   methods: {
@@ -160,16 +169,18 @@ export default {
       const self = this;
       let data = [];
 
-      await axios.get('https://api.spotify.com/v1/me', {
-        headers: {
-          Authorization: 'Bearer ' + this.accessToken
-        }
-      }).then(function (response) {
-        data = response.data;
-      })
-      .catch(function (error) {
-        self.unauthorized();
-      });
+      await axios
+        .get('https://api.spotify.com/v1/me', {
+          headers: {
+            Authorization: 'Bearer ' + this.accessToken,
+          },
+        })
+        .then(function (response) {
+          data = response.data;
+        })
+        .catch(function (error) {
+          self.unauthorized();
+        });
       return data;
     },
 
@@ -197,12 +208,14 @@ export default {
     },
 
     deleteTag(params) {
-      this.selected = this.selected.filter(x => x.id !== params.tag.text.id && x.id !== params.tag.id);
+      this.selected = this.selected.filter(
+        (x) => x.id !== params.tag.text.id && x.id !== params.tag.id
+      );
     },
 
     updateTags(input) {
       this.showError = false;
-      this.selected.push(input[input.length -1]);
+      this.selected.push(input[input.length - 1]);
     },
 
     updateSelected(selected) {
@@ -210,43 +223,47 @@ export default {
       this.selected = selected;
     },
 
-    async spotifyPostCall(url, data={}) {
+    async spotifyPostCall(url, data = {}) {
       const self = this;
       let resp = [];
 
-      await axios.post(url, data, {
-        headers: {
-          Authorization: 'Bearer ' + this.accessToken,
-          'Content-Type': 'application/json'
-        },
-      }).then(function (response) {
-        resp = response.data;
-      })
-      .catch(function (error) {
-        self.unauthorized();
-      });
+      await axios
+        .post(url, data, {
+          headers: {
+            Authorization: 'Bearer ' + this.accessToken,
+            'Content-Type': 'application/json',
+          },
+        })
+        .then(function (response) {
+          resp = response.data;
+        })
+        .catch(function (error) {
+          self.unauthorized();
+        });
       return resp;
     },
 
-    async spotifyGetSeeds(url, data={}) {
+    async spotifyGetSeeds(url, data = {}) {
       const self = this;
       let resp = [];
 
-      await axios.get(url, {
-        headers: {
-          Authorization: 'Bearer ' + this.accessToken
-        },
-        params: data,
-      }).then(function (response) {
-        resp = response.data.tracks;
-      })
-      .catch(function (error) {
-        if (error.response.status === 401) {
-          self.unauthorized();
-        } else {
-          self.noSuggestions();
-        }
-      });
+      await axios
+        .get(url, {
+          headers: {
+            Authorization: 'Bearer ' + this.accessToken,
+          },
+          params: data,
+        })
+        .then(function (response) {
+          resp = response.data.tracks;
+        })
+        .catch(function (error) {
+          if (error.response.status === 401) {
+            self.unauthorized();
+          } else {
+            self.noSuggestions();
+          }
+        });
       return resp;
     },
 
@@ -267,29 +284,27 @@ export default {
       let names = [];
 
       artists = this.selected
-        .filter(x => x.type === 'artist')
-        .map(x => x.id);
+        .filter((x) => x.type === 'artist')
+        .map((x) => x.id);
 
-      tracks = this.selected
-        .filter(x => x.type === 'track')
-        .map(x => x.id);
+      tracks = this.selected.filter((x) => x.type === 'track').map((x) => x.id);
 
-      names = this.selected.map(x => x.name);
+      names = this.selected.map((x) => x.name);
 
       let url = 'https://api.spotify.com/v1/recommendations';
       let data = {
-        'seed_tracks': tracks.join(','),
-        'seed_artists': artists.join(','),
-        'limit': this.numberOfTracks.name,
-      }
+        seed_tracks: tracks.join(','),
+        seed_artists: artists.join(','),
+        limit: this.numberOfTracks.name,
+      };
 
       let playlistTracks = await this.spotifyGetSeeds(url, data);
 
       if (playlistTracks.length) {
-        playlistTracks = playlistTracks.map(x => x.uri);
+        playlistTracks = playlistTracks.map((x) => x.uri);
 
         if (!this.playlistName.length) {
-          this.playlistName = "ModifySpotify Mix";
+          this.playlistName = 'ModifySpotify Mix';
         }
 
         url = `https://api.spotify.com/v1/users/${this.userId}/playlists`;
@@ -305,7 +320,7 @@ export default {
         if (playlistResp) {
           url = `https://api.spotify.com/v1/users/${this.userId}/playlists/${playlistResp.id}/tracks`;
           data = JSON.stringify({
-            'uris': playlistTracks,
+            uris: playlistTracks,
           });
 
           let playlistTracksResp = await this.spotifyPostCall(url, data);
@@ -314,13 +329,13 @@ export default {
             const twitterShare = `https://twitter.com/intent/tweet?url=${playlistResp.external_urls.spotify}&text=Check%20out%20this%20playlist%20I%20made%20on%20ModifySpotify.com`;
             const facebookShare = `https://www.facebook.com/sharer/sharer.php?u=${playlistResp.external_urls.spotify}`;
 
-            let span = document.createElement("span");
+            let span = document.createElement('span');
             span.innerHTML = `<a href="${playlistResp.external_urls.spotify}" target="_blank">Click here to view playlist</a><div id="share-playlist">Share this playlist:<div id="share-icons"><a href="${twitterShare}" target="_blank"><div id="twitter-icon"></div><a href="${facebookShare}" target="_blank"><div id="facebook-icon"></div></div></div>`;
 
             this.$swal({
-                title: `${this.playlistName} playlist created!`,
-                content: span,
-                allowOutsideClick: "true"
+              title: `${this.playlistName} playlist created!`,
+              content: span,
+              allowOutsideClick: 'true',
             });
           }
         }
@@ -343,14 +358,14 @@ export default {
 
     updateOptions(options) {
       let self = this;
-      let allOptions = options.map(function(item) {
+      let allOptions = options.map(function (item) {
         let i = Object.assign({}, item);
         i.text = item.name;
         return i;
       });
 
-      allOptions.forEach(function(i) {
-        if (!self.options.some(x => x.id === i.id)) {
+      allOptions.forEach(function (i) {
+        if (!self.options.some((x) => x.id === i.id)) {
           self.options.push(i);
         }
       });
@@ -361,15 +376,15 @@ export default {
         icon: 'error',
         title: 'Oops...',
         text: 'Spotify did not return any song recommendations. Please change your selection and try again.',
-      })
+      });
     },
   },
   async created() {
     this.userInfo = await this.meCall();
     this.userId = this.userInfo.id;
     VueCookies.set('user_id', this.userInfo.id);
-  }
-}
+  },
+};
 </script>
 
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
@@ -406,7 +421,8 @@ export default {
         width: 100%;
         .vue-tags-input {
           width: 74%;
-          .ti-tag, ti-content {
+          .ti-tag,
+          ti-content {
             background-color: #04dc5c;
           }
           .ti-tag {
@@ -415,7 +431,8 @@ export default {
           .ti-content {
             overflow: hidden;
           }
-          .ti-content, .ti-tag-center {
+          .ti-content,
+          .ti-tag-center {
             width: 100%;
           }
           .ti-tag-center > div {
@@ -449,7 +466,7 @@ export default {
             }
           }
           .ti-new-tag-input {
-            font-family: Avenir,Helvetica,Arial,sans-serif;
+            font-family: Avenir, Helvetica, Arial, sans-serif;
             font-size: 12px;
           }
           .ti-new-tag-input-wrapper {
@@ -469,8 +486,8 @@ export default {
         padding-right: 5px;
       }
       #playlist-builder-name {
-        border: 1px solid #e8e8e8;;
-        font-family: Avenir,Helvetica,Arial,sans-serif;
+        border: 1px solid #e8e8e8;
+        font-family: Avenir, Helvetica, Arial, sans-serif;
         font-size: 12px;
         padding-left: 10px;
         border-radius: 5px;
@@ -478,7 +495,8 @@ export default {
         outline: none;
         width: 100%;
       }
-      #make-playlist-button, #reset-playlist-button {
+      #make-playlist-button,
+      #reset-playlist-button {
         padding: 10px;
         margin-top: 5px;
         outline: none;
@@ -515,8 +533,11 @@ body {
   overflow: hidden;
 }
 
-body::-webkit-scrollbar, #builder-row::-webkit-scrollbar, #playlist-builder-options::-webkit-scrollbar, #playlist-options::-webkit-scrollbar {
-    display: none;
+body::-webkit-scrollbar,
+#builder-row::-webkit-scrollbar,
+#playlist-builder-options::-webkit-scrollbar,
+#playlist-options::-webkit-scrollbar {
+  display: none;
 }
 
 .multiselect {
@@ -537,7 +558,8 @@ body::-webkit-scrollbar, #builder-row::-webkit-scrollbar, #playlist-builder-opti
   .multiselect__input {
     width: fit-content;
   }
-  .multiselect__single, .multiselect__content-wrapper {
+  .multiselect__single,
+  .multiselect__content-wrapper {
     font-size: 12px;
   }
   .multiselect__element {
@@ -551,12 +573,13 @@ body::-webkit-scrollbar, #builder-row::-webkit-scrollbar, #playlist-builder-opti
 
 .swal-modal {
   .swal-title {
-    font-family: Avenir,Helvetica,Arial,sans-serif;
+    font-family: Avenir, Helvetica, Arial, sans-serif;
     font-weight: 500;
     font-size: 20px;
   }
-  .swal-content, .swal-text {
-    font-family: Avenir,Helvetica,Arial,sans-serif;
+  .swal-content,
+  .swal-text {
+    font-family: Avenir, Helvetica, Arial, sans-serif;
   }
 
   .swal-text {
@@ -600,8 +623,8 @@ body::-webkit-scrollbar, #builder-row::-webkit-scrollbar, #playlist-builder-opti
     flex-direction: column;
     #builder-row {
       height: 100%;
-      height: -moz-available;          /* WebKit-based browsers will ignore this. */
-      height: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */
+      height: -moz-available; /* WebKit-based browsers will ignore this. */
+      height: -webkit-fill-available; /* Mozilla-based browsers will ignore this. */
       height: fill-available;
     }
   }
