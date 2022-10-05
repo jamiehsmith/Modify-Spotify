@@ -1,12 +1,12 @@
 <template>
   <div>
-    <div id="selection-options">
+    <div class="selection-options">
       Here are your top artists and tracks:
       <multiselect
         v-model="selectionValue"
         track-by="name"
         label="label"
-        class="selection-options-dropdown"
+        class="selection-options__dropdown"
         :options="selectionOptions"
         :searchable="false"
         :close-on-select="true"
@@ -16,11 +16,11 @@
       >
       </multiselect>
     </div>
-    <div id="playlist-options">
+    <div class="playlist-options">
       <div
         :class="{
           'playlist-item': true,
-          'playlist-item-disabled': maxOptionsSelected && !isSelected(item)
+          'playlist-item-disabled': maxOptionsSelected && !isSelected(item),
         }"
         v-for="item in topCombined"
         :key="item"
@@ -29,18 +29,18 @@
         v-on:mouseleave="showInfo(null)"
         v-on:click.prevent="clickItem(item)"
       >
-        <div class="playlist-item-selected" v-if="isSelected(item)">
+        <div class="playlist-item--selected" v-if="isSelected(item)">
           <img
-            class="playlist-selected-checkmark"
+            class="playlist-selected__checkmark"
             src="../assets/checkmark.png"
           />
-          <div class="playlist-item-title" v-if="hoveredOn === item.id">
+          <div class="playlist-item__title" v-if="hoveredOn === item.id">
             <b>{{ item.type.toUpperCase() }}</b>
             <br />
             <span> {{ titleCard(item) }} </span>
           </div>
         </div>
-        <div v-else-if="hoveredOn === item.id" class="playlist-item-title">
+        <div v-else-if="hoveredOn === item.id" class="playlist-item__title">
           <b>{{ item.type.toUpperCase() }}</b>
           <br />
           <span> {{ titleCard(item) }} </span>
@@ -66,25 +66,25 @@ export default {
       selectionOptions: [
         { name: 'medium_term', label: 'Past 6 months' },
         { name: 'short_term', label: 'Past month' },
-        { name: 'long_term', label: 'All time' }
+        { name: 'long_term', label: 'All time' },
       ],
-      selectionValue: { name: 'medium_term', label: 'Past 6 months' }
+      selectionValue: { name: 'medium_term', label: 'Past 6 months' },
     };
   },
 
   props: {
     accessToken: {
       type: String,
-      required: true
+      required: true,
     },
     selected: {
       type: Array,
-      required: true
+      required: true,
     },
     playlistType: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
 
   watch: {
@@ -108,13 +108,13 @@ export default {
         }
       }
       this.$emit('selectedUpdated', this.selected);
-    }
+    },
   },
 
   computed: {
     maxOptionsSelected() {
       return this.selected.length >= this.maxOptions;
-    }
+    },
   },
 
   methods: {
@@ -149,13 +149,13 @@ export default {
     },
 
     isSelected(item) {
-      return this.selected.some(x => x['id'] === item.id);
+      return this.selected.some((x) => x['id'] === item.id);
     },
 
     clickItem(item) {
       let selectedChanged = false;
       if (this.isSelected(item)) {
-        this.selected = this.selected.filter(x => x.id !== item.id);
+        this.selected = this.selected.filter((x) => x.id !== item.id);
         selectedChanged = true;
       } else if (this.selected.length < this.maxOptions) {
         this.selected.push(item);
@@ -178,8 +178,8 @@ export default {
         .map((element, index) => [element, this.topTracks[index]])
         .flat();
 
-      this.selected.forEach(item => {
-        if (!this.topCombined.some(x => x.id === item.id)) {
+      this.selected.forEach((item) => {
+        if (!this.topCombined.some((x) => x.id === item.id)) {
           this.topCombined.push(item);
         }
       });
@@ -193,38 +193,38 @@ export default {
       await axios
         .get(`${url}?limit=50&time_range=${this.selectionValue.name}`, {
           headers: {
-            Authorization: 'Bearer ' + this.accessToken
-          }
+            Authorization: 'Bearer ' + this.accessToken,
+          },
         })
-        .then(response => {
+        .then((response) => {
           data = response.data.items;
         })
-        .catch(error => {
+        .catch((error) => {
           this.$emit('unauthorized');
         });
       return data;
-    }
+    },
   },
 
   async created() {
     await this.getSeedOptions();
-  }
+  },
 };
 </script>
 
 <style lang="scss" scoped>
-#selection-options {
+.selection-options {
   font-size: 13px;
   text-align: left;
   display: flex;
   align-items: center;
   padding-bottom: 10px;
-  .selection-options-dropdown {
+  .selection-options__dropdown {
     max-width: 100px;
     padding-left: 5px;
   }
 }
-#playlist-options {
+.playlist-options {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -237,7 +237,7 @@ export default {
     background-repeat: no-repeat;
     background-size: cover;
     cursor: pointer;
-    .playlist-item-title {
+    .playlist-item__title {
       flex-direction: column;
       display: flex;
       align-items: center;
@@ -249,12 +249,12 @@ export default {
       opacity: 0.9;
       overflow: hidden;
     }
-    .playlist-item-selected {
+    .playlist-item--selected {
       height: 94%;
       width: 94%;
       border: 3px solid white;
       position: relative;
-      .playlist-selected-checkmark {
+      .playlist-selected__checkmark {
         height: 20px;
         position: absolute;
         right: 5px;

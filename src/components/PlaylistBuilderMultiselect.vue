@@ -1,6 +1,6 @@
 <template>
-  <div class="playlist-builder-row">
-    <span class="playlist-builder-option-text">{{ text }}</span>
+  <div class="playlist-builder__row">
+    <span class="playlist-builder__option-text">{{ text }}</span>
     <multiselect
       v-model="value"
       track-by="name"
@@ -22,16 +22,16 @@ export default {
   props: {
     text: {
       type: String,
-      required: true
+      required: true,
     },
     value: {
       type: String,
-      required: true
+      required: true,
     },
     options: {
       type: Number,
-      required: true
-    }
-  }
+      required: true,
+    },
+  },
 };
 </script>

@@ -1,13 +1,13 @@
 <template>
-  <div id="login">
-    <div id="login-text">
+  <div class="login">
+    <div class="login__text">
       <h1>Modify Spotify</h1>
       <h4>
         {{ infoText }}
       </h4>
-      <button @click="clickLogin" id="login-button">
-        <img id="spotify-logo" src="../assets/spotify_logo.png" />
-        <span id="login-button-text">Login with Spotify</span>
+      <button @click="clickLogin" class="login__button">
+        <img class="spotify-logo" src="../assets/spotify_logo.png" />
+        <span class="login__button__text">Login with Spotify</span>
       </button>
     </div>
   </div>
@@ -20,25 +20,25 @@ export default {
   data() {
     return {
       infoText:
-        "View your top artists and tracks, and make playlists utilizing Spotify's recommendation engine."
+        "View your top artists and tracks, and make playlists utilizing Spotify's recommendation engine.",
     };
   },
 
   methods: {
     clickLogin() {
       window.location = '/login';
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style lang="scss" scoped>
-#login {
-  #login-text {
+.login {
+  .login__text {
     display: flex;
     flex-direction: column;
     align-items: center;
-    #login-button {
+    .login__button {
       margin-top: 30px;
       outline: none;
       display: flex;
@@ -51,11 +51,11 @@ export default {
       color: #04dc5c;
       cursor: pointer;
       border: 1px solid #ccc;
-      #spotify-logo {
+      .spotify-logo {
         height: 25px;
         padding-right: 10px;
       }
-      #login-button-text {
+      .login__button__text {
         font-size: 16px;
         font-weight: 600;
       }

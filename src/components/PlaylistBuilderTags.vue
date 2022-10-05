@@ -1,6 +1,6 @@
 <template>
-  <div id="playlist-builder-selection" class="playlist-builder-row">
-    <span class="playlist-builder-option-text">{{ text }}</span>
+  <div class="playlist-builder-selection playlist-builder__row">
+    <span class="playlist-builder__option-text">{{ text }}</span>
     <vue-tags-input
       v-model="value"
       :tags="tags"
@@ -9,8 +9,8 @@
       :class="{ 'show-error': error }"
       :autocomplete-items="filteredItems"
       :add-only-from-autocomplete="true"
-      @tags-changed="obj => $emit('updateTags', obj)"
-      @before-deleting-tag="obj => $emit('deleteTag', obj)"
+      @tags-changed="(obj) => $emit('updateTags', obj)"
+      @before-deleting-tag="(obj) => $emit('deleteTag', obj)"
     >
       <div slot="tag-center" slot-scope="props">
         {{ formatTags(props.tag) }}
@@ -29,37 +29,37 @@ export default {
   data() {
     return {
       maxOptions: 5,
-      tagPlaceholder: 'Select artists or tracks'
+      tagPlaceholder: 'Select artists or tracks',
     };
   },
 
   props: {
     text: {
       type: String,
-      required: true
+      required: true,
     },
     value: {
       type: String,
-      required: true
+      required: true,
     },
     tags: {
       type: Array,
-      required: true
+      required: true,
     },
     filteredItems: {
       type: Array,
-      required: true
+      required: true,
     },
     error: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
 
   computed: {
     maxOptionsSelected() {
       return this.tags.length >= this.maxOptions;
-    }
+    },
   },
 
   methods: {
@@ -77,7 +77,7 @@ export default {
 
     formatTrack(tag) {
       return `${tag.name} by ${tag.artists[0].name}`;
-    }
-  }
+    },
+  },
 };
 </script>

@@ -1,13 +1,13 @@
 <template>
-  <div id="user-info">
-    <img id="user-image" :v-if="userImage" :src="userImage" />
-    <div id="user-info-text">
-      <span id="user-name" :v-if="userInfo.display_name">
+  <div class="user-info">
+    <img class="user__image" :v-if="userImage" :src="userImage" />
+    <div class="user-info__text">
+      <span class="user-name" :v-if="userInfo.display_name">
         {{ userInfo.display_name }}
       </span>
-      <span id="user-info-row">
+      <span class="user-info__row">
         <span :v-if="userFollowers"> Followers: {{ userFollowers }} </span>
-        <span id="user-info-separator" :v-if="userFollowers && userProfileUrl">
+        <span class="user-info__separator" :v-if="userFollowers && userProfileUrl">
           &middot;
         </span>
         <span :v-if="userProfileUrl">
@@ -25,12 +25,12 @@ export default {
   props: {
     accessToken: {
       type: String,
-      required: true
+      required: true,
     },
     userInfo: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
 
   computed: {
@@ -54,39 +54,39 @@ export default {
       if (this.userInfo.external_urls && this.userInfo.external_urls.spotify) {
         return this.userInfo.external_urls.spotify;
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style lang="scss" scoped>
-#user-info {
+.user-info {
   display: flex;
   flex-direction: row;
   align-items: center;
   width: auto;
   padding: 5px;
   justify-content: center;
-  #user-info-text {
+  .user-info__text {
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 5px;
   }
-  #user-image {
+  .user__image {
     padding: 5px;
     max-height: 100px;
     border-radius: 50%;
   }
-  #user-name {
+  .user-name {
     font-size: 16px;
   }
-  #user-info-row {
+  .user-info__row {
     display: flex;
     align-items: center;
     font-size: 12px;
     white-space: nowrap;
-    #user-info-separator {
+    .user-info__separator {
       font-size: 20px;
       padding: 4px;
     }
@@ -94,13 +94,13 @@ export default {
 }
 
 @media screen and (max-width: 600px) {
-  #user-image {
+  .user__image {
     max-height: 50px !important;
   }
 }
 
 @media screen and (max-height: 450px) {
-  #user-image {
+  .user__image {
     max-height: 50px !important;
   }
 }

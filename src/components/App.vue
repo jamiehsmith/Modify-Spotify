@@ -1,10 +1,5 @@
 <template>
   <div id="app">
-    <img
-      class="favicon"
-      src="../assets/favicon.png"
-      :style="{ height: '1px', width: '1px', display: 'none' }"
-    />
     <div v-if="isLoggedIn">
       <PlaylistBuilder
         :accessToken="accessToken"
@@ -12,10 +7,10 @@
         @unauthorized="resetAccessToken"
       />
     </div>
-    <div v-else id="app-login">
+    <div v-else class="app__login">
       <Login />
     </div>
-    <div id="disclaimer">
+    <div class="disclaimer">
       Made by
       <a href="http://www.jamieistyping.com" target="_blank">Jamie Smith</a>.
       This website is not affiliated with Spotify.
@@ -26,28 +21,27 @@
 <script>
 import Login from './Login.vue';
 import PlaylistBuilder from './PlaylistBuilder.vue';
-import VueCookies from 'vue-cookies';
 
 export default {
   name: 'app',
 
   components: {
     PlaylistBuilder,
-    Login
+    Login,
   },
 
   data() {
     return {
       accessToken: '',
       refreshToken: '',
-      userId: null
+      userId: null,
     };
   },
 
   computed: {
     isLoggedIn() {
       return !!this.accessToken;
-    }
+    },
   },
 
   methods: {
@@ -57,22 +51,22 @@ export default {
       } else {
         this.accessToken = '';
       }
-    }
+    },
   },
 
   mounted() {
     const cookiesMap = {
       access_token: 'accessToken',
       refresh_token: 'refreshToken',
-      user_id: 'userId'
+      user_id: 'userId',
     };
 
     for (const [key, value] of Object.entries(cookiesMap)) {
-      if (VueCookies.get(key)) {
-        this[value] = VueCookies.get(key);
+      if ($cookies.get(key)) {
+        this[value] = $cookies.get(key);
       }
     }
-  }
+  },
 };
 </script>
 
@@ -92,7 +86,7 @@ body {
   margin-top: 10px;
   height: 100%;
   width: 100%;
-  #app-login {
+  .app__login {
     height: 100%;
     width: 100%;
     display: flex;
@@ -120,7 +114,7 @@ a {
   color: #04dc5c;
 }
 
-#disclaimer {
+.disclaimer {
   position: fixed;
   bottom: 0px;
   width: 100%;
@@ -150,12 +144,12 @@ a {
   }
 }
 
-#share-playlist {
+.share-playlist {
   padding-top: 10px;
-  #share-icons {
+  .share-icons {
     display: flex;
     justify-content: center;
-    #twitter-icon {
+    .twitter-icon {
       margin: 5px;
       width: 35px;
       height: 35px;
@@ -164,7 +158,7 @@ a {
       background-repeat: no-repeat;
       border: none;
     }
-    #facebook-icon {
+    .facebook-icon {
       margin: 5px;
       width: 35px;
       height: 35px;
