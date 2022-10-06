@@ -46,7 +46,7 @@ export default {
       type: Array,
       required: true,
     },
-    filteredItems: {
+    options: {
       type: Array,
       required: true,
     },
@@ -59,6 +59,12 @@ export default {
   computed: {
     maxOptionsSelected() {
       return this.tags.length >= this.maxOptions;
+    },
+
+    filteredItems() {
+      return this.options.filter((i) => {
+        return i.name.toLowerCase().indexOf(this.value.toLowerCase()) !== -1;
+      });
     },
   },
 

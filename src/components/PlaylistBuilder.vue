@@ -1,7 +1,7 @@
 <template>
   <div class="playlist-builder__container">
     <div class="builder__row">
-      <UserInfo :accessToken="accessToken" :userInfo="userInfo" />
+      <UserInfo :userInfo="userInfo" />
       <div class="playlist-builder">
         <span class="playlist-builder__title">Playlist Builder</span>
         <PlaylistBuilderMultiselect
@@ -14,7 +14,7 @@
           text="Playlist seeds:"
           :value="tag"
           :tags="selected"
-          :filteredItems="filteredItems"
+          :options="options"
           :error="showError"
           @updateTags="updateTags"
           @deleteTag="deleteTag"
@@ -55,7 +55,7 @@
               src="../assets/loading.gif"
             />
           </button>
-          <button v-on:click="reset" class="reset-playlist__button">
+          <button @click="reset" class="reset-playlist__button">
             <span>Reset</span>
           </button>
         </div>
@@ -130,11 +130,6 @@ export default {
   computed: {
     maxOptionsSelected() {
       return this.selected.length >= this.maxOptions;
-    },
-    filteredItems() {
-      return this.options.filter((i) => {
-        return i.name.toLowerCase().indexOf(this.tag.toLowerCase()) !== -1;
-      });
     },
   },
 

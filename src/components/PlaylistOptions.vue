@@ -18,8 +18,8 @@
     </div>
     <div class="playlist-options">
       <div
+        class="playlist-item"
         :class="{
-          'playlist-item': true,
           'playlist-item-disabled': maxOptionsSelected && !isSelected(item),
         }"
         v-for="item in topCombined"
@@ -27,7 +27,7 @@
         v-bind:style="{ backgroundImage: itemBackground(item) }"
         v-on:mouseenter="showInfo(item.id)"
         v-on:mouseleave="showInfo(null)"
-        v-on:click.prevent="clickItem(item)"
+        @click.prevent="clickItem(item)"
       >
         <div class="playlist-item--selected" v-if="isSelected(item)">
           <img
@@ -99,7 +99,7 @@ export default {
           if (!this.selected.includes(this.topCombined[randomNumber])) {
             this.selected.push(this.topCombined[randomNumber]);
           } else if (this.topCombined.length >= 5) {
-            // Restart interation for new pick
+            // Restart iteration for new pick
             i -= 1;
           } else {
             // Less than 5 options, choose them all
@@ -193,7 +193,7 @@ export default {
       await axios
         .get(`${url}?limit=50&time_range=${this.selectionValue.name}`, {
           headers: {
-            Authorization: 'Bearer ' + this.accessToken,
+            Authorization: `Bearer ${this.accessToken}`,
           },
         })
         .then((response) => {

@@ -23,10 +23,6 @@ export default {
   name: 'UserInfo',
 
   props: {
-    accessToken: {
-      type: String,
-      required: true,
-    },
     userInfo: {
       type: Object,
       required: true,
@@ -34,10 +30,6 @@ export default {
   },
 
   computed: {
-    queryParams() {
-      return 'limit=50';
-    },
-
     userImage() {
       if (this.userInfo.images && this.userInfo.images.length) {
         return this.userInfo.images[0].url;
