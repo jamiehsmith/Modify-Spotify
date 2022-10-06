@@ -3,7 +3,7 @@
     <span class="playlist-builder__option-text">{{ text }}</span>
     <vue-tags-input
       v-model="value"
-      :tags="tags"
+      :tags="selected"
       :max-tags="maxOptions"
       :placeholder="!maxOptionsSelected ? tagPlaceholder : ''"
       :class="{ 'show-error': error }"
@@ -23,12 +23,15 @@
 </template>
 
 <script>
+import playlistMixin from '../lib/playlistMixin';
+
 export default {
   name: 'PlaylistBuilderTags',
 
+  mixins: [playlistMixin],
+
   data() {
     return {
-      maxOptions: 5,
       tagPlaceholder: 'Select artists or tracks',
     };
   },
@@ -42,7 +45,7 @@ export default {
       type: String,
       required: true,
     },
-    tags: {
+    selected: {
       type: Array,
       required: true,
     },
@@ -57,10 +60,6 @@ export default {
   },
 
   computed: {
-    maxOptionsSelected() {
-      return this.tags.length >= this.maxOptions;
-    },
-
     filteredItems() {
       return this.options.filter((i) => {
         return i.name.toLowerCase().indexOf(this.value.toLowerCase()) !== -1;

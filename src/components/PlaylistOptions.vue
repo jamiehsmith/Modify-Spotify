@@ -20,7 +20,7 @@
       <div
         class="playlist-item"
         :class="{
-          'playlist-item-disabled': maxOptionsSelected && !isSelected(item),
+          'playlist-item--disabled': maxOptionsSelected && !isSelected(item),
         }"
         v-for="item in topCombined"
         :key="item"
@@ -52,9 +52,12 @@
 
 <script>
 import axios from 'axios';
+import playlistMixin from '../lib/playlistMixin';
 
 export default {
-  name: 'PlaylistBuilder',
+  name: 'PlaylistOptions',
+
+  mixins: [playlistMixin],
 
   data() {
     return {
@@ -62,7 +65,6 @@ export default {
       topTracks: [],
       topCombined: [],
       hoveredOn: null,
-      maxOptions: 5,
       selectionOptions: [
         { name: 'medium_term', label: 'Past 6 months' },
         { name: 'short_term', label: 'Past month' },
@@ -108,12 +110,6 @@ export default {
         }
       }
       this.$emit('selectedUpdated', this.selected);
-    },
-  },
-
-  computed: {
-    maxOptionsSelected() {
-      return this.selected.length >= this.maxOptions;
     },
   },
 
@@ -262,7 +258,7 @@ export default {
       }
     }
   }
-  .playlist-item-disabled {
+  .playlist-item--disabled {
     cursor: not-allowed;
   }
 }

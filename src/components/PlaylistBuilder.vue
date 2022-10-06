@@ -13,7 +13,7 @@
         <PlaylistBuilderTags
           text="Playlist seeds:"
           :value="tag"
-          :tags="selected"
+          :selected="selected"
           :options="options"
           :error="showError"
           @updateTags="updateTags"
@@ -80,9 +80,12 @@ import UserInfo from './UserInfo.vue';
 import PlaylistOptions from './PlaylistOptions.vue';
 import PlaylistBuilderMultiselect from './PlaylistBuilderMultiselect.vue';
 import PlaylistBuilderTags from './PlaylistBuilderTags.vue';
+import playlistMixin from '../lib/playlistMixin';
 
 export default {
   name: 'PlaylistBuilder',
+
+  mixins: [playlistMixin],
 
   components: {
     UserInfo,
@@ -97,7 +100,6 @@ export default {
       tag: '',
       selected: [],
       isLoading: false,
-      maxOptions: 5,
       playlistName: '',
       playlistOptions: [
         { name: 'custom', label: 'Custom playlist' },
@@ -124,12 +126,6 @@ export default {
     userId: {
       type: Number,
       required: true,
-    },
-  },
-
-  computed: {
-    maxOptionsSelected() {
-      return this.selected.length >= this.maxOptions;
     },
   },
 

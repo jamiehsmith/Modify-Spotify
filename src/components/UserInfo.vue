@@ -68,6 +68,9 @@ export default {
   .user__image {
     padding: 5px;
     max-height: 100px;
+    height: 100px;
+    max-width: 100px;
+    width: 100px;
     border-radius: 50%;
   }
   .user-name {
@@ -88,12 +91,14 @@ export default {
 @media screen and (max-width: 600px) {
   .user__image {
     max-height: 50px !important;
+    max-width: 50px !important;
   }
 }
 
 @media screen and (max-height: 450px) {
   .user__image {
     max-height: 50px !important;
+    max-width: 50px !important;
   }
 }
 </style>
